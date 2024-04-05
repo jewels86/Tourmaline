@@ -11,5 +11,6 @@ namespace Tourmaline.Scripts
         public string URL;
         public string Address;
         public int Status;
+        public string Type;
     }
 }

@@ -8,4 +8,8 @@
     <RuntimeIdentifiers>win-x64;win-x86;win-arm64;linux-x64;osx-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.60" />
+  </ItemGroup>
+
 </Project>
