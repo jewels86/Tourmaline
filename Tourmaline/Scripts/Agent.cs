@@ -30,20 +30,23 @@ namespace Tourmaline.Scripts
             HttpResponseMessage response;
             Queue<string> queue = new();
 
-            ProcessURL();
+            ProcessURL(ref url);
             if (await VerifySite() == false) 
                 throw new Exception("The base page of the site either returned a non success status code or is not of type 'text/html'");
 
-            queue.Enqueue("");
+            queue.Enqueue(url);
 
             int i = 0;
             while (queue.Count > 0 && i < maxPaths)
             {
                 Path path = new();
                 string adr = queue.Dequeue();
-                if (strpaths.Contains(adr)) continue;
+                ProcessURL(ref adr);
 
-                response = await client.GetAsync(url + adr);
+                if (strpaths.Contains(adr)) continue;
+                if (!adr.Contains(CutURLToDomain(url))) continue;
+
+                response = await client.GetAsync(adr);
                 string type = response.Content.Headers.ContentType?.MediaType ?? "unknown";
 
                 if (!response.IsSuccessStatusCode)
@@ -51,9 +54,8 @@ namespace Tourmaline.Scripts
                     continue;
                 }
 
-                path.Address = adr;
                 path.Status = (int)response.StatusCode;
-                path.URL = url + adr;
+                path.URL = adr;
                 path.Type = type;
 
                 strpaths.Add(adr);
@@ -87,10 +89,25 @@ namespace Tourmaline.Scripts
             return paths;
         }
 
-        private void ProcessURL()
+        internal void ProcessURL(ref string url, bool isBaseURL = false)
         {
-            url = url.EndsWith("/") ? url : url + "/";
-            url = url.StartsWith("http://") ? url : "http://" + url;
+            if (url.StartsWith("/")  && !isBaseURL)
+            {
+                url = this.url + url;
+            }
+
+            url = url.StartsWith("http://") || url.StartsWith("https://") ? url : "http://" + url;
+
+            string[] parts = url.Split('#', '?');
+            url = parts[0];
+            
+        }
+        internal string CutURLToDomain(string url)
+        {
+            string output = url;
+            ProcessURL(ref output);
+            string[] parts = output.Split("/");
+            return parts[2];
         }
         private async Task<bool> VerifySite()
         {

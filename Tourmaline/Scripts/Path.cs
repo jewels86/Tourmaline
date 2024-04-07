@@ -9,7 +9,6 @@ namespace Tourmaline.Scripts
     public struct Path
     {
         public string URL;
-        public string Address;
         public int Status;
         public string Type;
     }
