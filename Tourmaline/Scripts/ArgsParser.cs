@@ -13,27 +13,35 @@ namespace Tourmaline.Scripts
             { "u", true }
         };
 
-        internal static Dictionary<string, string?> Parse(string[] args)
+        internal static Dictionary<string, string> Parse(string[] args)
         {
-            Dictionary<string, object> output = new();
+            Dictionary<string, string> output = new();
 
-            bool nextIsValue = false
+            bool nextIsValue = false;
+            string currentFlag = "";
             foreach (string arg in args)
             {
                 if (arg.StartsWith('-') || arg.Length >= 2)
                 {
                     // is a flag
-                    if (nextIsValue) throw new Exception("Invalid arguments");
-                    if (!Args.ContainsKey(arg[1])) throw new Exception("Invalid arguments");
+                    currentFlag = $"{arg[1]}";
 
-                    if (Args[arg[1]] == true) nextIsValue = true;
+                    if (nextIsValue) throw new Exception("Invalid arguments");
+                    if (!Args.ContainsKey(currentFlag)) throw new Exception("Invalid arguments");
+
+                    if (Args[currentFlag] == true) nextIsValue = true;
                     else nextIsValue = false;
                 } 
                 else
                 {
                     // not a flag
+                    if (!nextIsValue) throw new Exception("Invalid arguments");
+
+                    output[currentFlag] = arg;
+                    nextIsValue = false;
                 }
             }
+            return output;
 
         }
     }
