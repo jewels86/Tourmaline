@@ -49,10 +49,7 @@ namespace Tourmaline.Scripts
                 response = await client.GetAsync(adr);
                 string type = response.Content.Headers.ContentType?.MediaType ?? "unknown";
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    continue;
-                }
+                if (400 <= (int)response.StatusCode && (int)response.StatusCode < 500) continue;
 
                 path.Status = (int)response.StatusCode;
                 path.URL = adr;
@@ -62,6 +59,7 @@ namespace Tourmaline.Scripts
 
                 if (type == "text/html")
                 {
+                    if (!response.IsSuccessStatusCode) continue;
                     string html = await response.Content.ReadAsStringAsync();
 
                     HtmlDocument doc = new();

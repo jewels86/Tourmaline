@@ -1,22 +1,26 @@
 using System;
+using System.Reflection.Metadata.Ecma335;
 using Spectre.Console;
 
 namespace Tourmaline
 {
     internal class GUI
     {
-        internal Table table = new();
+        internal Table Table = new();
+        internal Action<string, string, string> AddRow = (a,b,c) => { };
+        internal TaskCompletionSource TaskCompletionSource = new();
 
         internal void Start()
         {
-            AnsiConsole.Live(table)
-                .Start(ctx =>
-                {
-                    table.AddColumn("URL");
-                    table.AddColumn("Status");
-                    table.AddColumn("Type");
-                });
+            Table.AddColumns("URL", "Type", "Status")
+                .Alignment(Justify.Left)
+                .Width = 300;
 
+            AnsiConsole.Live(Table).StartAsync(async (ctx) => 
+            {
+                AddRow = (a, b, c) => { Table.AddRow($"[blue]{a}[/]", b, c); ctx.UpdateTarget(Table); };
+                await TaskCompletionSource.Task;
+            });
         }
     }
 }
