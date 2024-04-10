@@ -1,2 +1,2 @@
 # Tourmaline-Directory Enumerator
-![50%](https://progress-bar.dev/50)
+![90%](https://progress-bar.dev/90)
