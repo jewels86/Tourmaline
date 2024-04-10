@@ -47,7 +47,7 @@ namespace Tourmaline.Scripts
                     output.Add(pathOutput);
 
                     next?.Invoke(pathOutput);
-                } catch (Exception ex)
+                } catch
                 {
                     if (DevMode) throw;
                     continue;
@@ -57,9 +57,13 @@ namespace Tourmaline.Scripts
 
             if (OutfilePath != null)
             {
-                File.Create(OutfilePath);
+                if (!File.Exists(OutfilePath)) { 
+                    FileStream stream = File.Create(OutfilePath); 
+                    stream.Close();
+                }
+                
                 Path[] array = output.ToArray();
-                string[] realArray = [];
+                string[] realArray = new string[array.Length];
 
                 int i = 0;
                 foreach (var path in array)

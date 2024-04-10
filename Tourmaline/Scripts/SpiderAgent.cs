@@ -84,7 +84,7 @@ namespace Tourmaline.Scripts
                     paths.Add(path);
                     next?.Invoke(path);
                     i++;
-                } catch (Exception ex)
+                } catch
                 {
                     if (DevMode) throw;
                     continue;

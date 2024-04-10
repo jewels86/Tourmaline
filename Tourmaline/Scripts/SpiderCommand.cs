@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Spectre.Console;
 using Spectre.Console.Cli;
 using Tourmaline;
 
@@ -15,7 +16,7 @@ namespace Tourmaline.Scripts
         {
             [Description("URL to use the spider on")]
             [CommandArgument(0, "<url>")]
-            public string URL { get; init; }
+            public required string URL { get; init; }
 
             [Description("The max amount of paths to search")]
             [CommandOption("-m|--max-paths")]
@@ -28,11 +29,42 @@ namespace Tourmaline.Scripts
 
         public async override Task<int> ExecuteAsync(CommandContext context, Settings settings)
         {
-            SpiderAgent agent = new(settings.URL);
-            if (settings.MaxPaths != null) agent.MaxPaths = (int)settings.MaxPaths;
-            if (settings.DevMode != null && settings.DevMode == true) agent.DevMode = (bool)settings.DevMode;
+            Table table = new();
+            table.AddColumns("[Blue]Tourmaline[/]", "");
+            table.AddRow("Lincense", "GPL v3")
+                .AddRow("Creator(s)", "Jewels")
+                .AddRow("Mode", "Spider")
+                .AddRow("URL", settings.URL)
+                .AddRow("Max paths?", settings.MaxPaths?.ToString() ?? "false")
+                .AddRow("Dev mode?", settings.DevMode?.ToString() ?? false.ToString());
+            table.Width(100);
+            AnsiConsole.Write(table);
+
+            Status status = AnsiConsole.Status();
 
             GUI gui = new();
+            SpiderAgent agent = new(settings.URL);
+
+            await status.StartAsync("Starting...", async ctx =>
+            {
+                await Task.Delay(200);
+
+                ctx.Status = "Configuring agent...";
+                if (settings.MaxPaths != null) agent.MaxPaths = (int)settings.MaxPaths;
+                if (settings.DevMode != null && settings.DevMode == true) agent.DevMode = (bool)settings.DevMode;
+                await Task.Delay(1000);
+
+                ctx.Status = "Finished";
+                await Task.Delay(200);
+            });
+
+            string start = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("Ready?")
+                    .AddChoices("Yes", "No")
+            );
+
+            if (start == "No") return -1;
 
             gui.Start();
             await agent.Start((path) => gui.AddRow(path.URL, path.Type, path.Status.ToString()));
