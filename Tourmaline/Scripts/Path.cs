@@ -11,5 +11,10 @@ namespace Tourmaline.Scripts
         public string URL;
         public int Status;
         public string Type;
+
+        public override string ToString()
+        {
+            return $"{URL} ({Type} - {Status})";
+        }
     }
 }

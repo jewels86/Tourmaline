@@ -34,19 +34,44 @@ namespace Tourmaline.Scripts
 
             foreach (var path in paths)
             {
-                HttpResponseMessage res = await client.GetAsync($"{URL}/{path}");
-                if (!((int)res.StatusCode < 400)) continue;
+                try
+                {
+                    HttpResponseMessage res = await client.GetAsync($"{URL}/{path}");
+                    if (!((int)res.StatusCode < 400)) continue;
 
-                Path pathOutput = new();
-                pathOutput.URL = $"{URL}/{path}";
-                pathOutput.Type = res.Content.Headers.ContentType?.MediaType ?? "unknown";
-                pathOutput.Status = (int)res.StatusCode;
+                    Path pathOutput = new();
+                    pathOutput.URL = $"{URL}/{path}";
+                    pathOutput.Type = res.Content.Headers.ContentType?.MediaType ?? "unknown";
+                    pathOutput.Status = (int)res.StatusCode;
 
-                output.Add(pathOutput);
+                    output.Add(pathOutput);
 
-                next?.Invoke(pathOutput);
+                    next?.Invoke(pathOutput);
+                } catch (Exception ex)
+                {
+                    if (DevMode) throw;
+                    continue;
+                }
+                
             }
 
+            if (OutfilePath != null)
+            {
+                File.Create(OutfilePath);
+                Path[] array = output.ToArray();
+                string[] realArray = [];
+
+                int i = 0;
+                foreach (var path in array)
+                {
+                    realArray[i] = path.ToString();
+                    i++;
+                }
+
+                File.WriteAllLines(OutfilePath, realArray);
+            }
+
+            client.Dispose();
             return output;
         }
 

@@ -12,6 +12,7 @@ namespace Tourmaline.Scripts
         public int RateLimit { get; set; }
         public int MaxPaths { get; set; }
         public bool DevMode { get; set; } = false;
+        public string? OutfilePath { get; set; }
 
         public SpiderAgent(string url, int rateLimit = 60, int maxPaths = int.MaxValue) 
         {
@@ -85,10 +86,26 @@ namespace Tourmaline.Scripts
                     i++;
                 } catch (Exception ex)
                 {
-                    if (DevMode) throw ex;
+                    if (DevMode) throw;
                     continue;
                 }
                 
+            }
+
+            if (OutfilePath != null)
+            {
+                File.Create(OutfilePath);
+                Path[] array = paths.ToArray();
+                string[] realArray = [];
+
+                int k = 0;
+                foreach (var path in array)
+                {
+                    realArray[k] = path.ToString();
+                    k++;
+                }
+
+                File.WriteAllLines(OutfilePath, realArray);
             }
 
             client.Dispose();

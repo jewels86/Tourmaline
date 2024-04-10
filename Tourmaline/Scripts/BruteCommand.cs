@@ -18,6 +18,8 @@ namespace Tourmaline.Scripts
 
             [CommandOption("-d")]
             public bool? DevMode { get; set; }
+            [CommandOption("-o")]
+            public string? OutfilePath { get; set; }
         }
 
         public async override Task<int> ExecuteAsync(CommandContext context, Settings settings)
@@ -25,6 +27,7 @@ namespace Tourmaline.Scripts
             BruteAgent agent = new(settings.WordlistPath, settings.URL);
             //if (settings.MaxPaths != null) agent.MaxPaths = (int)settings.MaxPaths;
             if (settings.DevMode != null && settings.DevMode == true) agent.DevMode = (bool)settings.DevMode;
+            if (settings.OutfilePath != null) agent.OutfilePath = settings.OutfilePath;
 
             GUI gui = new();
 
