@@ -37,11 +37,14 @@ namespace Tourmaline.Scripts
             if (type == "Spider")
             {
                 strBuilder.Append("tourmaline spider ");
-                strBuilder.Append(url);
+                strBuilder.Append(url + " ");
+
+                int maxPaths = AnsiConsole.Prompt(new TextPrompt<int>("Max paths? (-1 if none)"));
+                if (maxPaths != -1) strBuilder.Append($"-m {maxPaths}");
 
             } else
             {
-                strBuilder.Append("tourmaline brute");
+                strBuilder.Append("tourmaline brute ");
                 strBuilder.Append(url);
             }
 
