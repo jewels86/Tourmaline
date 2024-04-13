@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Spectre.Console.Cli;
+﻿using Spectre.Console.Cli;
 using Spectre.Console;
 
 namespace Tourmaline.Scripts
@@ -19,9 +14,12 @@ namespace Tourmaline.Scripts
 
             [CommandOption("-d")]
             public bool? DevMode { get; init; }
-            [CommandOption("-o")]
+            [CommandOption("-o|--outfile-path")]
             public string? OutfilePath { get; init; }
-
+            [CommandOption("--outfile-bare")]
+            public bool? OutfileBare { get; init; }
+            [CommandOption("--output-bare")]
+            public bool? OutputBare { get; init; }
         }
 
         public async override Task<int> ExecuteAsync(CommandContext context, Settings settings)
@@ -48,8 +46,9 @@ namespace Tourmaline.Scripts
                 await Task.Delay(200);
 
                 ctx.Status = "Configuring agent...";
-                if (settings.DevMode != null && settings.DevMode == true) agent.DevMode = (bool)settings.DevMode;
+                if (settings.DevMode != null && settings.DevMode == true) agent.DevMode = true;
                 if (settings.OutfilePath != null) agent.OutfilePath = settings.OutfilePath;
+                if (settings.OutfileBare != null && settings.OutfileBare == true) agent.BareOutfile = true;
                 await Task.Delay(1000);
 
                 ctx.Status = "Finished";
@@ -63,9 +62,15 @@ namespace Tourmaline.Scripts
             );
 
             if (start == "No") return -1;
-
-            gui.Start();
-            await agent.Start((path) => gui.AddRow(path.URL, path.Type, path.Status.ToString()));
+            if (settings.OutputBare != null && settings.OutputBare == true)
+            {
+                await agent.Start((path) => Console.WriteLine(path.URL));
+            } else
+            {
+                gui.Start();
+                await agent.Start((path) => gui.AddRow(path.URL, path.Type, path.Status.ToString()));
+            }
+            
 
             gui.TaskCompletionSource.TrySetResult();
 

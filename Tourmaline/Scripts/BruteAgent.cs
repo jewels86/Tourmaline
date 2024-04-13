@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Tourmaline.Scripts
+﻿namespace Tourmaline.Scripts
 {
     public class BruteAgent
     {
@@ -12,6 +6,7 @@ namespace Tourmaline.Scripts
         public string WordlistPath { get; set; }
         public string? OutfilePath { get; set; }
         public bool DevMode { get; set; } = false;
+        public bool BareOutfile { get; set; } = false;
 
         internal BruteAgent(string wordlistPath, string url)
         {
@@ -66,11 +61,22 @@ namespace Tourmaline.Scripts
                 string[] realArray = new string[array.Length];
 
                 int i = 0;
-                foreach (var path in array)
+                if (!BareOutfile)
                 {
-                    realArray[i] = path.ToString();
-                    i++;
+                    foreach (var path in array)
+                    {
+                        realArray[i] = path.ToString();
+                        i++;
+                    }
+                } else
+                {
+                    foreach (var path in array)
+                    {
+                        realArray[i] = path.URL;
+                        i++;
+                    }
                 }
+                
 
                 File.WriteAllLines(OutfilePath, realArray);
             }

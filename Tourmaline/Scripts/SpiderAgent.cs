@@ -1,7 +1,3 @@
-using System;
-using System.Net.Http;
-using System.Runtime.Loader;
-using System.Windows.Markup;
 using HtmlAgilityPack;
 
 namespace Tourmaline.Scripts 
@@ -13,6 +9,7 @@ namespace Tourmaline.Scripts
         public int MaxPaths { get; set; }
         public bool DevMode { get; set; } = false;
         public string? OutfilePath { get; set; }
+        public bool BareOutfile { get; set; } = false;
 
         public SpiderAgent(string url, int rateLimit = 60, int maxPaths = int.MaxValue) 
         {
@@ -67,16 +64,18 @@ namespace Tourmaline.Scripts
 
                         HtmlDocument doc = new();
                         doc.LoadHtml(html);
-                        IEnumerable<HtmlNode> nodes = doc.DocumentNode.SelectNodes("//img | //script | //link | //a");
+                        IEnumerable<HtmlNode> nodes = doc.DocumentNode.SelectNodes("//img | //script | //link | //a | //form");
                         if (nodes != null)
                         {
                             foreach (HtmlNode node in nodes)
                             {
                                 string src = node.GetAttributeValue("src", "");
                                 string href = node.GetAttributeValue("href", "");
+                                string action = node.GetAttributeValue("action", "");
 
                                 if (!string.IsNullOrEmpty(src)) queue.Enqueue(src);
                                 if (!string.IsNullOrEmpty(href)) queue.Enqueue(href);
+                                if (!string.IsNullOrEmpty(action)) queue.Enqueue(action);
                             }
                         }
                     }
@@ -99,11 +98,22 @@ namespace Tourmaline.Scripts
                 string[] realArray = [];
 
                 int k = 0;
-                foreach (var path in array)
+                if (!BareOutfile)
                 {
-                    realArray[k] = path.ToString();
-                    k++;
+                    foreach (var path in array)
+                    {
+                        realArray[k] = path.ToString();
+                        k++;
+                    }
+                } else
+                {
+                    foreach (var path in array)
+                    {
+                        realArray[k] = path.URL;
+                        k++;
+                    }
                 }
+                
 
                 File.WriteAllLines(OutfilePath, realArray);
             }

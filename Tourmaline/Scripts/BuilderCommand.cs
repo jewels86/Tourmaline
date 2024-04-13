@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Spectre.Console;
 using Spectre.Console.Cli;
-using Tourmaline;
 
 namespace Tourmaline.Scripts
 {
@@ -25,7 +19,6 @@ namespace Tourmaline.Scripts
             AnsiConsole.MarkupLine("Welcome to the [Blue]Tourmaline[/] command builder!");
             AnsiConsole.MarkupLine("This is meant to help you create [Blue]Tourmaline[/] commands (CTRL + C to quit)");
             AnsiConsole.MarkupLine("We are going to ask you a couple of questions to help us generate the command.");
-            AnsiConsole.MarkupLine("If you are new to directory enumeration, run this again with '-n'.");
 
             string url = AnsiConsole.Prompt(new TextPrompt<string>("Target URL:"));
 
@@ -45,7 +38,10 @@ namespace Tourmaline.Scripts
             } else
             {
                 strBuilder.Append("tourmaline brute ");
-                strBuilder.Append(url);
+                strBuilder.Append(url + " ");
+
+                string wordlistPath = AnsiConsole.Prompt(new TextPrompt<string>("Wordlist Path?"));
+                strBuilder.Append(wordlistPath + " ");
             }
 
             AnsiConsole.MarkupLine("Here's your command: \n");
