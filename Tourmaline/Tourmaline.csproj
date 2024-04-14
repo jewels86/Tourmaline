@@ -13,9 +13,18 @@
 	</PropertyGroup>
 
   <ItemGroup>
-	  <PackageReference Include="HtmlAgilityPack" Version="1.11.6"/>
+	  <PackageReference Include="HtmlAgilityPack" Version="1.11.6" />
 	  <PackageReference Include="Spectre.Console" Version="0.48.0" />
 	<PackageReference Include="Spectre.Console.Cli" Version="0.48.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="init.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="init.sh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

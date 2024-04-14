@@ -1,3 +1,5 @@
+using System.Text;
+using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 
 namespace Tourmaline.Scripts 
@@ -5,17 +7,17 @@ namespace Tourmaline.Scripts
     public class SpiderAgent
     {
         public string URL { get; set; }
-        public int RateLimit { get; set; }
-        public int MaxPaths { get; set; }
+        public int? RateLimit { get; set; }
+        public ulong? MaxPaths { get; set; }
         public bool DevMode { get; set; } = false;
         public string? OutfilePath { get; set; }
         public bool BareOutfile { get; set; } = false;
+        public Regex? Regex { get; set; }
+        public Regex? IgnoreRegex { get; set; }
 
-        public SpiderAgent(string url, int rateLimit = 60, int maxPaths = int.MaxValue) 
+        public SpiderAgent(string url) 
         {
             this.URL = url;
-            this.RateLimit = rateLimit;
-            this.MaxPaths = maxPaths;
         }
 
         public async Task<List<Path>> Start(Action<Path>? next = null)
@@ -34,8 +36,8 @@ namespace Tourmaline.Scripts
 
             queue.Enqueue(URL);
 
-            int i = 0;
-            while (queue.Count > 0 && i < MaxPaths)
+            ulong i = 0;
+            while (queue.Count > 0 && MaxPaths != null ? i < MaxPaths : i >= 0)
             {
                 try
                 {
@@ -78,10 +80,25 @@ namespace Tourmaline.Scripts
                                 if (!string.IsNullOrEmpty(action)) queue.Enqueue(action);
                             }
                         }
+                    } else if (type.Contains("text"))
+                    {
+                        /*string text = await response.Content.ReadAsStringAsync();
+                        Regex regex = new("[\"'](.*?)/(.*?)[\"']");
+                        var matches = regex.Matches(text);
+                        foreach (string match in matches)
+                        {
+                            var _match = match.Split('"')[0];
+                            if (_match.StartsWith("./"))
+                            {
+                                
+                            }
+                        }*/
                     }
 
-                    paths.Add(path);
-                    next?.Invoke(path);
+                    if ((Regex?.IsMatch(adr) ?? true) == true && (IgnoreRegex?.IsMatch(adr) ?? false) == false)
+                    {
+                        paths.Add(path); next?.Invoke(path);
+                    }
                     i++;
                 } catch
                 {

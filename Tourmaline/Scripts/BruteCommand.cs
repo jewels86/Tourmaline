@@ -1,5 +1,6 @@
 ﻿using Spectre.Console.Cli;
 using Spectre.Console;
+using System.ComponentModel;
 
 namespace Tourmaline.Scripts
 {
@@ -7,17 +8,27 @@ namespace Tourmaline.Scripts
     {
         public sealed class Settings : CommandSettings
         {
+            [Description("The url to operate on.")]
             [CommandArgument(0, "<url>")]
             public required string URL { get; init; }
+
+            [Description("The path to the wordlist.")]
             [CommandArgument(1, "<wordlistPath>")]
             public required string WordlistPath { get; init; }
 
+            [Description("Initiates dev mode.")]
             [CommandOption("-d")]
             public bool? DevMode { get; init; }
+
+            [Description("Path to the outfile.")]
             [CommandOption("-o|--outfile-path")]
             public string? OutfilePath { get; init; }
+
+            [Description("Makes the outfile bare so it only contains paths.")]
             [CommandOption("--outfile-bare")]
             public bool? OutfileBare { get; init; }
+
+            [Description("Makes the output bare so it only shows paths.")]
             [CommandOption("--output-bare")]
             public bool? OutputBare { get; init; }
         }

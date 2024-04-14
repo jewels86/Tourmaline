@@ -1,3 +1,4 @@
-echo Initializing..
-alias tourmaline=/home/jewels/Projects/Tourmaline-Spider/Tourmaline/bin/Release/net8.0/linux-x64/Tourmaline
+echo Initializing...
+echo -e '\nalias tourmaline=$PWD/Tourmaline\n' >> ~/bash_aliases
+source ~/.bashrc
 echo Finished.

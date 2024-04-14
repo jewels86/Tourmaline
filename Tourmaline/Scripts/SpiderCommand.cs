@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Text;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
@@ -14,14 +15,29 @@ namespace Tourmaline.Scripts
 
             [Description("The max amount of paths to search")]
             [CommandOption("-m|--max-paths")]
-            public int? MaxPaths { get; init; }
+            public ulong? MaxPaths { get; init; }
+
+            [Description("Regex all paths must pass.")]
+            [CommandOption("-r")]
+            public string? Regex { get; set; }
+
+            [Description("Regex for ignoring paths.")]
+            [CommandOption("-i")]
+            public string? IgnoreRegex { get; set; }
+
+            [Description("Outfile.")]
+            [CommandOption("-o")]
+            public string? OutfilePath { get; init; }
 
             [Description("Initates dev mode")]
             [CommandOption("-d|--dev-mode")]
             public bool? DevMode { get; init; }
 
+            [Description("Makes the outfile bare so it only contains paths.")]
             [CommandOption("--outfile-bare")]
             public bool? OutfileBare { get; init; }
+
+            [Description("Makes the output bare so it only shows paths.")]
             [CommandOption("--output-bare")]
             public bool? OutputBare { get; init; }
         }
@@ -34,8 +50,11 @@ namespace Tourmaline.Scripts
                 .AddRow("Creator(s)", "Jewels")
                 .AddRow("Mode", "Spider")
                 .AddRow("URL", settings.URL)
-                .AddRow("Max paths?", settings.MaxPaths?.ToString() ?? "false")
-                .AddRow("Dev mode?", settings.DevMode?.ToString() ?? false.ToString());
+                .AddRow("Outfile?", settings.OutfilePath ?? "null")
+                .AddRow("Max paths?", settings.MaxPaths?.ToString() ?? "null")
+                .AddRow("Dev mode?", settings.DevMode?.ToString() ?? false.ToString())
+                .AddRow("Regex?", settings.Regex is not null ? new StringBuilder(settings.Regex).Replace("[", "[[").Replace("]", "]]").ToString() : "null")
+                .AddRow("Ignore Regex?", settings.IgnoreRegex is not null ? new StringBuilder(settings.IgnoreRegex).Replace("[", "[[").Replace("]", "]]").ToString() : "null");
             table.Width(100);
             AnsiConsole.Write(table);
 
@@ -49,9 +68,11 @@ namespace Tourmaline.Scripts
                 await Task.Delay(200);
 
                 ctx.Status = "Configuring agent...";
-                if (settings.MaxPaths != null) agent.MaxPaths = (int)settings.MaxPaths;
+                if (settings.MaxPaths != null) agent.MaxPaths = settings.MaxPaths;
                 if (settings.DevMode != null && settings.DevMode == true) agent.DevMode = (bool)settings.DevMode;
                 if (settings.OutfileBare != null && settings.OutfileBare == true) agent.BareOutfile = (bool)settings.OutfileBare;
+                if (settings.Regex is not null) agent.Regex = new(settings.Regex);
+                if (settings.IgnoreRegex is not null) agent.IgnoreRegex = new(settings.IgnoreRegex);
                 await Task.Delay(1000);
 
                 ctx.Status = "Finished";
@@ -65,7 +86,6 @@ namespace Tourmaline.Scripts
             );
 
             if (start == "No") return -1;
-
             if (settings.OutputBare != null && settings.OutputBare == true)
             {
                 await agent.Start((path) => Console.WriteLine(path.URL));
