@@ -83,7 +83,7 @@ namespace Tourmaline.Scripts
                     } else if (type.Contains("text"))
                     {
                         /*string text = await response.Content.ReadAsStringAsync();
-                        Regex regex = new("[\"'](.*?)/(.*?)[\"']");
+                        Regex regex = new(@"[\(""'][^""'\(].*[\/\\\.].*[^""'\)][\)""']");
                         var matches = regex.Matches(text);
                         foreach (string match in matches)
                         {

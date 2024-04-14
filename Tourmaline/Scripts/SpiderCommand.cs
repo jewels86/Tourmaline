@@ -68,9 +68,9 @@ namespace Tourmaline.Scripts
                 await Task.Delay(200);
 
                 ctx.Status = "Configuring agent...";
-                if (settings.MaxPaths != null) agent.MaxPaths = settings.MaxPaths;
-                if (settings.DevMode != null && settings.DevMode == true) agent.DevMode = (bool)settings.DevMode;
-                if (settings.OutfileBare != null && settings.OutfileBare == true) agent.BareOutfile = (bool)settings.OutfileBare;
+                if (settings.MaxPaths is not null) agent.MaxPaths = settings.MaxPaths;
+                if (settings.DevMode is not null && settings.DevMode == true) agent.DevMode = (bool)settings.DevMode;
+                if (settings.OutfileBare is not null && settings.OutfileBare == true) agent.BareOutfile = (bool)settings.OutfileBare;
                 if (settings.Regex is not null) agent.Regex = new(settings.Regex);
                 if (settings.IgnoreRegex is not null) agent.IgnoreRegex = new(settings.IgnoreRegex);
                 await Task.Delay(1000);
@@ -86,7 +86,7 @@ namespace Tourmaline.Scripts
             );
 
             if (start == "No") return -1;
-            if (settings.OutputBare != null && settings.OutputBare == true)
+            if (settings.OutputBare is not null && settings.OutputBare == true)
             {
                 await agent.Start((path) => Console.WriteLine(path.URL));
             }
