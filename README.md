@@ -30,3 +30,15 @@ Other flags are specified in the `tourmaline spider -h` command.
 The tourmaline brute forcer is used to find pages served by the site. It needs a wordlist to function. It pretty much just sends requests to every path on the wordlist and logs successful attempts.
 ### Build
 The build command is used to generate commands for tourmaline. You enter some information about the purpose and it gives you a command.
+
+## Todos
+- Spider
+    - Add threads
+    - Add stray value 
+    - Speed optimizations
+- Brute
+    - Add threads
+- Add docs
+- Installations
+    - Add package to `apt`
+    - Fix windows installation
