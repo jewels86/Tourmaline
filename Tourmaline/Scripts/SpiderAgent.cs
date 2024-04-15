@@ -1,6 +1,5 @@
-using System.Text;
 using System.Text.RegularExpressions;
-using HtmlAgilityPack;
+using Spectre.Console;
 
 namespace Tourmaline.Scripts 
 {
@@ -17,7 +16,7 @@ namespace Tourmaline.Scripts
 
         public SpiderAgent(string url) 
         {
-            this.URL = url;
+            URL = url;
         }
 
         public async Task<List<Path>> Start(Action<Path>? next = null)
@@ -61,38 +60,24 @@ namespace Tourmaline.Scripts
 
                     if (type == "text/html")
                     {
-                        if (!response.IsSuccessStatusCode) continue;
                         string html = await response.Content.ReadAsStringAsync();
-
-                        HtmlDocument doc = new();
-                        doc.LoadHtml(html);
-                        IEnumerable<HtmlNode> nodes = doc.DocumentNode.SelectNodes("//img | //script | //link | //a | //form");
-                        if (nodes != null)
+                        Regex regex = new(@"(src|href|action)=['""]([a-zA-Z0-9\\\/\.?!#,=:;&% ]*)['""]");
+                        MatchCollection matches = regex.Matches(html);
+                        foreach (Match match in matches)
                         {
-                            foreach (HtmlNode node in nodes)
-                            {
-                                string src = node.GetAttributeValue("src", "");
-                                string href = node.GetAttributeValue("href", "");
-                                string action = node.GetAttributeValue("action", "");
-
-                                if (!string.IsNullOrEmpty(src)) queue.Enqueue(src);
-                                if (!string.IsNullOrEmpty(href)) queue.Enqueue(href);
-                                if (!string.IsNullOrEmpty(action)) queue.Enqueue(action);
-                            }
+                            queue.Enqueue(match.Groups[2].ToString());
                         }
-                    } else if (type.Contains("text"))
+                    }
+                    else if (type.Contains("text"))
                     {
-                        /*string text = await response.Content.ReadAsStringAsync();
-                        Regex regex = new(@"[\(""'][^""'\(].*[\/\\\.].*[^""'\)][\)""']");
-                        var matches = regex.Matches(text);
-                        foreach (string match in matches)
+                        string text = await response.Content.ReadAsStringAsync();
+                        Regex regex2 = new(@"['""]([a-zA-Z0-9\\\/\.?!#,=:;&% ]+[\\\/\.][a-zA-Z0-9\\\/\.?!#,=:;&% ]+)['""]");
+                        MatchCollection matches = regex2.Matches(text);
+                        foreach (Match match in matches)
                         {
-                            var _match = match.Split('"')[0];
-                            if (_match.StartsWith("./"))
-                            {
-                                
-                            }
-                        }*/
+                            queue.Append(match.ToString());
+                            AnsiConsole.WriteLine(match.Groups[1].ToString());
+                        }
                     }
 
                     if ((Regex?.IsMatch(adr) ?? true) == true && (IgnoreRegex?.IsMatch(adr) ?? false) == false)
@@ -146,8 +131,10 @@ namespace Tourmaline.Scripts
                 url = URL + url;
             }
 
-            url = url.StartsWith("http://") || url.StartsWith("https://") ? url : "http://" + url;
-
+            url = url.StartsWith("http://") ? url.Substring(7) : url;
+            url = url.StartsWith("https://") ? url.Substring(8) : url;
+            url = url.StartsWith("www.") ? url.Substring(4) : url;
+            url = $"http://{url}";
             string[] parts = url.Split('#', '?');
             url = parts[0];
             
