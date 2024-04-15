@@ -4,7 +4,7 @@ A directory enumeration tool with many modes.
 ## Installation
 This installation process needs refinement, but this works for now.
 ### Linux
-Download the newest release's `linux-x64.zip` and extract it. Then run the command `source init.sh` from inside the directory. This sets the alias so the app is ready to be used.
+Download the newest release's `linux-x64.zip` and extract it. Then run the command `source init.sh` from inside the directory, then `source ~/.bashrc`. This sets the alias so the app is ready to be used.
 ### Windows
 Download the newest release's `win-x64.zip` and extract it. Then run the command `./init.ps1` from inside the directory. This sets the alias so the app is ready to be used.
 
