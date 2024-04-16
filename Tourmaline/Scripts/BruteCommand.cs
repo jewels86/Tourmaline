@@ -20,6 +20,9 @@ namespace Tourmaline.Scripts
             [CommandOption("-d")]
             public bool? DevMode { get; init; }
 
+            [CommandOption("-t")]
+            public short? Threads { get; init; }
+
             [Description("Path to the outfile.")]
             [CommandOption("-o|--outfile-path")]
             public string? OutfilePath { get; init; }
@@ -60,6 +63,7 @@ namespace Tourmaline.Scripts
                 if (settings.DevMode != null && settings.DevMode == true) agent.DevMode = true;
                 if (settings.OutfilePath != null) agent.OutfilePath = settings.OutfilePath;
                 if (settings.OutfileBare != null && settings.OutfileBare == true) agent.BareOutfile = true;
+                if (settings.Threads is not null) agent.Threads = (short)settings.Threads;
                 await Task.Delay(1000);
 
                 ctx.Status = "Finished";

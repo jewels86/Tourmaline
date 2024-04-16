@@ -7,6 +7,7 @@
         public string? OutfilePath { get; set; }
         public bool DevMode { get; set; } = false;
         public bool BareOutfile { get; set; } = false;
+        public short Threads { get; set; } = 1;
 
         internal BruteAgent(string wordlistPath, string url)
         {
@@ -18,36 +19,68 @@
         {
             List<Path> output = new();
             HttpClient client = new();
-            List<string> paths;
+            Queue<string> queue;
+
+            object outputLock = new();
+            object clientLock = new();
+            object queueLock = new();
 
             string _tmp = URL;
             ProcessURL(ref _tmp, true);
             URL = _tmp;
 
             var file = await File.ReadAllLinesAsync(WordlistPath);
-            paths = new(file);
+            queue = new(file);
 
-            foreach (var path in paths)
+            async Task thread(ThreadCompletionSource tcs)
             {
-                try
+                string address;
+                lock (queueLock)
                 {
-                    HttpResponseMessage res = await client.GetAsync($"{URL}/{path}");
-                    if (!((int)res.StatusCode < 400)) continue;
-
-                    Path pathOutput = new();
-                    pathOutput.URL = $"{URL}/{path}";
-                    pathOutput.Type = res.Content.Headers.ContentType?.MediaType ?? "unknown";
-                    pathOutput.Status = (int)res.StatusCode;
-
-                    output.Add(pathOutput);
-
-                    next?.Invoke(pathOutput);
-                } catch
-                {
-                    if (DevMode) throw;
-                    continue;
+                    if (queue.Count == 0) return;
+                    address = queue.Dequeue()!;
                 }
-                
+
+                ProcessURL(ref address);
+                HttpClient _client;
+
+                lock (clientLock)
+                {
+                    _client = client;
+                }
+
+                HttpResponseMessage response = await _client.GetAsync(address);
+                if ((short)response.StatusCode > 400) return;
+
+                Path path = new();
+                path.URL = address;
+                path.Status = (int)response.StatusCode;
+                path.Type = response.Content.Headers.ContentType?.MediaType ?? "unknown";
+
+                lock (outputLock)
+                {
+                    output.Add(path);
+                }
+
+                tcs.Finish();
+                next?.Invoke(path);
+            };
+
+            short openThreads = 0;
+            List<ThreadCompletionSource> tcsl = new();
+            while (queue.Count - 1 > 0)
+            {
+                if (openThreads >= Threads)
+                {
+                    while (openThreads >= Threads) await Task.Delay(50);
+                }
+                ThreadCompletionSource tcs = new();
+                thread(tcs);
+                tcsl.Add(tcs);
+            }
+            foreach (ThreadCompletionSource tcs in tcsl)
+            {
+                if (!tcs.IsFinished()) await tcs.Wait();
             }
 
             if (OutfilePath != null)
@@ -92,8 +125,10 @@
                 url = URL + url;
             }
 
-            url = url.StartsWith("http://") || url.StartsWith("https://") ? url : "http://" + url;
-
+            url = url.StartsWith("http://") ? url.Substring(7) : url;
+            url = url.StartsWith("https://") ? url.Substring(8) : url;
+            url = url.StartsWith("www.") ? url.Substring(4) : url;
+            url = $"http://{url}";
             string[] parts = url.Split('#', '?');
             url = parts[0];
 
