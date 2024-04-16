@@ -31,43 +31,54 @@
 
             var file = await File.ReadAllLinesAsync(WordlistPath);
             queue = new(file);
-
-            async Task thread(ThreadCompletionSource tcs)
+            
+            Action<ThreadCompletionSource> thread = async (tcs) =>
             {
-                string address;
-                lock (queueLock)
+                try
                 {
-                    if (queue.Count == 0) return;
-                    address = queue.Dequeue()!;
-                }
+                    string address;
+                    lock (queueLock)
+                    {
+                        if (queue.Count == 0) { tcs.Finish(); return; }
+                        address = $"{URL}/{queue.Dequeue()!}";
+                    }
 
-                ProcessURL(ref address);
-                HttpClient _client;
+                    ProcessURL(ref address);
+                    HttpClient _client;
 
-                lock (clientLock)
+                    lock (clientLock)
+                    {
+                        _client = client;
+                    }
+
+                    HttpResponseMessage response = await _client.GetAsync(address);
+                    if ((int)response.StatusCode > 400) { tcs.Finish(); return; }
+
+
+                    Path path = new();
+                    path.URL = address;
+                    path.Status = (int)response.StatusCode;
+                    path.Type = response.Content.Headers.ContentType?.MediaType ?? "unknown";
+
+                    lock (outputLock)
+                    {
+                        output.Add(path);
+                    }
+
+                    tcs.Finish();
+                    next?.Invoke(path);
+                } catch
                 {
-                    _client = client;
+                    Console.WriteLine("D: Caught");
+                    if (DevMode) throw;
+                    tcs.Finish();
+                    return;
                 }
-
-                HttpResponseMessage response = await _client.GetAsync(address);
-                if ((short)response.StatusCode > 400) return;
-
-                Path path = new();
-                path.URL = address;
-                path.Status = (int)response.StatusCode;
-                path.Type = response.Content.Headers.ContentType?.MediaType ?? "unknown";
-
-                lock (outputLock)
-                {
-                    output.Add(path);
-                }
-
-                tcs.Finish();
-                next?.Invoke(path);
+                
             };
 
             short openThreads = 0;
-            List<ThreadCompletionSource> tcsl = new();
+            Thread[] threads = new Thread[Threads];
             while (queue.Count - 1 > 0)
             {
                 if (openThreads >= Threads)
@@ -75,12 +86,16 @@
                     while (openThreads >= Threads) await Task.Delay(50);
                 }
                 ThreadCompletionSource tcs = new();
-                thread(tcs);
-                tcsl.Add(tcs);
+                tcs.Finished += () => { openThreads -= 1; };
+                threads[openThreads] = new(() => thread(tcs));
+                threads[openThreads].Name = "Tourmaline Brute";
+                threads[openThreads].Start();
+
+                openThreads++;
             }
-            foreach (ThreadCompletionSource tcs in tcsl)
+            foreach (Thread _thread in threads)
             {
-                if (!tcs.IsFinished()) await tcs.Wait();
+                _thread.Join();
             }
 
             if (OutfilePath != null)

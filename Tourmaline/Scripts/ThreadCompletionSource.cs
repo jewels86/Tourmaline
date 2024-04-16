@@ -9,26 +9,30 @@ namespace Tourmaline.Scripts
     public class ThreadCompletionSource
     {
         private readonly object tcsLock = new();
-        public bool Finished { get; set; } = false;
+        private bool finished { get; set; } = false;
+
+        public delegate void Handler();
+        public event Handler Finished = delegate { };
 
         public void Finish()
         {
             lock (tcsLock)
             {
-                Finished = true;
+                Finished.Invoke();
+                finished = true;
             }
         }
         public async Task Wait()
         {
             while (true)
             {
-                bool finished;
+                bool _finished;
                 lock (tcsLock)
                 {
-                    finished = Finished;
+                    _finished = finished;
                 }
 
-                if (finished == true) break;
+                if (_finished == true) break;
                 await Task.Delay(50);
             }
         }
@@ -36,7 +40,7 @@ namespace Tourmaline.Scripts
         {
             lock (tcsLock)
             {
-                return Finished;
+                return finished;
             }
         }
     }
