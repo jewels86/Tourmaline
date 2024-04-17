@@ -17,13 +17,13 @@
 
         internal async Task<List<Path>> Start(Action<Path>? next = null)
         {
-            List<Path> output = new();
+            List<Path> output = [];
             HttpClient client = new();
             Queue<string> queue;
 
             object outputLock = new();
-            object clientLock = new();
             object queueLock = new();
+            object nextLock = new();
 
             string _tmp = URL;
             ProcessURL(ref _tmp, true);
@@ -31,8 +31,8 @@
 
             var file = await File.ReadAllLinesAsync(WordlistPath);
             queue = new(file);
-            
-            Action<ThreadCompletionSource> thread = async (tcs) =>
+
+            async void thread(ThreadCompletionSource tcs)
             {
                 try
                 {
@@ -44,21 +44,17 @@
                     }
 
                     ProcessURL(ref address);
-                    HttpClient _client;
 
-                    lock (clientLock)
-                    {
-                        _client = client;
-                    }
-
-                    HttpResponseMessage response = await _client.GetAsync(address);
+                    HttpResponseMessage response = await client.GetAsync(address);
                     if ((int)response.StatusCode > 400) { tcs.Finish(); return; }
 
 
-                    Path path = new();
-                    path.URL = address;
-                    path.Status = (int)response.StatusCode;
-                    path.Type = response.Content.Headers.ContentType?.MediaType ?? "unknown";
+                    Path path = new()
+                    {
+                        URL = address,
+                        Status = (int)response.StatusCode,
+                        Type = response.Content.Headers.ContentType?.MediaType ?? "unknown"
+                    };
 
                     lock (outputLock)
                     {
@@ -66,29 +62,29 @@
                     }
 
                     tcs.Finish();
-                    next?.Invoke(path);
-                } catch
+                    lock (nextLock) next?.Invoke(path);
+                }
+                catch
                 {
-                    Console.WriteLine("D: Caught");
-                    if (DevMode) throw;
+                    if (DevMode == true) throw;
                     tcs.Finish();
                     return;
                 }
-                
-            };
+
+            }
 
             short openThreads = 0;
             Thread[] threads = new Thread[Threads];
             while (queue.Count - 1 > 0)
             {
-                if (openThreads >= Threads)
-                {
-                    while (openThreads >= Threads) await Task.Delay(50);
-                }
+                while (openThreads >= Threads) await Task.Delay(50);
+
                 ThreadCompletionSource tcs = new();
                 tcs.Finished += () => { openThreads -= 1; };
-                threads[openThreads] = new(() => thread(tcs));
-                threads[openThreads].Name = "Tourmaline Brute";
+                threads[openThreads] = new(() => thread(tcs))
+                {
+                    Name = "Tourmaline Brute"
+                };
                 threads[openThreads].Start();
 
                 openThreads++;
@@ -105,7 +101,7 @@
                     stream.Close();
                 }
                 
-                Path[] array = output.ToArray();
+                Path[] array = [.. output];
                 string[] realArray = new string[array.Length];
 
                 int i = 0;
@@ -135,14 +131,14 @@
 
         internal void ProcessURL(ref string url, bool isBaseURL = false)
         {
-            if (url.StartsWith("/") && !isBaseURL)
+            if (url.StartsWith('/') && !isBaseURL)
             {
                 url = URL + url;
             }
 
-            url = url.StartsWith("http://") ? url.Substring(7) : url;
-            url = url.StartsWith("https://") ? url.Substring(8) : url;
-            url = url.StartsWith("www.") ? url.Substring(4) : url;
+            url = url.StartsWith("http://") ? url[7..] : url;
+            url = url.StartsWith("https://") ? url[8..] : url;
+            url = url.StartsWith("www.") ? url[4..] : url;
             url = $"http://{url}";
             string[] parts = url.Split('#', '?');
             url = parts[0];

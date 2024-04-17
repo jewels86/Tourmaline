@@ -1,7 +1,7 @@
 # Tourmaline
 A tunable all-in-one directory enumeration tool.
 Latest release: v1.0
-Latest version: v1.6
+Latest version: v1.7
 ## Installation
 This installation process needs refinement, but this works for now.
 ### Linux
@@ -28,7 +28,13 @@ Flags:
 - `-i`: The regex all paths must NOT pass to be returned (ignored)
 Other flags are specified in the `tourmaline spider -h` command.
 ### Brute
-The tourmaline brute forcer is used to find pages served by the site. It needs a wordlist to function. It pretty much just sends requests to every path on the wordlist and logs successful attempts.
+The tourmaline brute forcer is used to find pages served by the site. It needs a wordlist to function.
+It pretty much just sends requests to every path on the wordlist and logs successful attempts.  
+It is recommended to run the brute with multiple threads and at least twice, since it gives varying results with multiple runs.
+
+Flags:
+- `-t`: The number of threads to use during enumeration.
+
 ### Build
 The build command is used to generate commands for tourmaline. You enter some information about the purpose and it gives you a command.
 
