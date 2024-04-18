@@ -13,6 +13,7 @@ namespace Tourmaline.Scripts
         public bool BareOutfile { get; set; } = false;
         public Regex? Regex { get; set; }
         public Regex? IgnoreRegex { get; set; }
+        public short Threads { get; set; } = 1;
 
         public SpiderAgent(string url) 
         {
@@ -24,8 +25,15 @@ namespace Tourmaline.Scripts
             List<Path> paths = new();
             List<string> strpaths = new();
             HttpClient client = new();
-            HttpResponseMessage response;
             Queue<string> queue = new();
+
+            object pathsLock = new();
+            object strpathsLock = new();
+            object queueLock = new();
+            object iLock = new();
+
+            ulong i = 0;
+            bool waitFM = false; // Wait for more/me
 
             string _tmp = URL;
             ProcessURL(ref _tmp);
@@ -35,62 +43,97 @@ namespace Tourmaline.Scripts
 
             queue.Enqueue(URL);
 
-            ulong i = 0;
-            while (queue.Count > 0 && MaxPaths != null ? i < MaxPaths : i >= 0)
+            async void thread() 
             {
-                try
+                while (true)
                 {
-                    Path path = new();
-                    string adr = queue.Dequeue();
-                    ProcessURL(ref adr);
-
-                    if (strpaths.Contains(adr)) continue;
-                    if (!adr.Contains(CutURLToDomain(URL))) continue;
-
-                    response = await client.GetAsync(adr);
-                    string type = response.Content.Headers.ContentType?.MediaType ?? "unknown";
-
-                    if (400 <= (int)response.StatusCode && (int)response.StatusCode < 500) continue;
-
-                    path.Status = (int)response.StatusCode;
-                    path.URL = adr;
-                    path.Type = type;
-
-                    strpaths.Add(adr);
-
-                    if (type == "text/html")
+                    try
                     {
-                        string html = await response.Content.ReadAsStringAsync();
-                        Regex regex = new(@"(src|href|action)=['""]([a-zA-Z0-9\\\/\.?!#,=:;&% ]*)['""]");
-                        MatchCollection matches = regex.Matches(html);
-                        foreach (Match match in matches)
+                        lock (iLock) if ((MaxPaths is not null ? true : i <= MaxPaths) == true) 
+                                return;
+                        string address;
+                        lock (queueLock)
                         {
-                            queue.Enqueue(match.Groups[2].ToString());
+                            if (queue.Count == 0 && !waitFM) 
+                                return;
+                            else if (waitFM) while (waitFM && queue.Count == 0) 
+                                    Thread.Sleep(50);
+                            address = queue.Dequeue();
+                            waitFM = true;
                         }
-                    }
-                    else if (type.Contains("text"))
-                    {
-                        string text = await response.Content.ReadAsStringAsync();
-                        Regex regex2 = new(@"['""]([a-zA-Z0-9\\\/\.?!#,=:;&% ]+[\\\/\.][a-zA-Z0-9\\\/\.?!#,=:;&% ]+)['""]");
-                        MatchCollection matches = regex2.Matches(text);
-                        foreach (Match match in matches)
-                        {
-                            queue.Append(match.ToString());
-                            AnsiConsole.WriteLine(match.Groups[1].ToString());
-                        }
-                    }
 
-                    if ((Regex?.IsMatch(adr) ?? true) == true && (IgnoreRegex?.IsMatch(adr) ?? false) == false)
+                        ProcessURL(ref address);
+                        lock (strpathsLock)
+                        {
+                            if (strpaths.Contains(address) || !address.Contains(CutURLToDomain(address))) 
+                                continue;
+                            strpaths.Add(address);
+                        }
+
+                        HttpResponseMessage response = await client.GetAsync(address);
+
+                        Path path = new()
+                        {
+                            URL = address,
+                            Status = (int)response.StatusCode,
+                            Type = response.Content.Headers.ContentType?.MediaType ?? "unknown"
+                        };
+
+                        if (path.Status > 400)
+                            continue;
+
+                        if (path.Type.Contains("html"))
+                        {
+                            string html = await response.Content.ReadAsStringAsync();
+                            Regex regex = new(@"(src|href|action)=""([a-zA-Z0-9\\\/\.?!#,=:;&% ]+)""");
+                            MatchCollection matches = regex.Matches(html);
+                            foreach(Match match in matches)
+                            {
+                                lock (queueLock) queue.Enqueue(match.Groups[1].ToString());
+                            }
+                            
+                        }
+                        else if (path.Type.Contains("text"))
+                        {
+                            string text = await response.Content.ReadAsStringAsync();
+                            Regex regex = new(@"['""]([a-zA-Z0-9\\\/\.?!#,=:;&% ]+[\\\/\.][a-zA-Z0-9\\\/\.?!#,=:;&% ]+)['""]");
+                            MatchCollection matches = regex.Matches(@"['""]([a-zA-Z0-9\\\/\.?!#,=:;&% ]+[\\\/\.][a-zA-Z0-9\\\/\.?!#,=:;&% ]+)['""]");
+                            foreach (Match match in matches)
+                            {
+                                lock (queueLock) queue.Enqueue(match.Groups[0].ToString());
+                            }
+                        }
+
+                        if ((Regex?.IsMatch(address) ?? true) == true && (IgnoreRegex?.IsMatch(address) ?? false) == false)
+                        {
+                            next?.Invoke(path); paths.Add(path);
+                        }
+                        lock (iLock) i++;
+                        response.Dispose();
+                    } 
+                    catch
                     {
-                        paths.Add(path); next?.Invoke(path);
+                        if (DevMode) throw;
                     }
-                    i++;
-                } catch
-                {
-                    if (DevMode) throw;
-                    continue;
+                    waitFM = false;
                 }
-                
+            }
+
+            Thread[] threads = new Thread[Threads];
+            for (int j = 0; j < Threads; j++)
+            {
+                Thread.Sleep(10);
+                threads[j] = new(thread)
+                {
+                    Name = "Tourmaline Spider"
+                };
+                threads[j].Start();
+            }
+            while (queue.Count > 0 || waitFM) 
+                Thread.Sleep(50);
+            foreach (Thread _thread in threads)
+            {
+                _thread.Join();
             }
 
             if (OutfilePath != null)

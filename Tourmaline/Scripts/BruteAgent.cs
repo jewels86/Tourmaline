@@ -77,7 +77,7 @@
             Thread[] threads = new Thread[Threads];
             while (queue.Count - 1 > 0)
             {
-                while (openThreads >= Threads) await Task.Delay(50);
+                while (openThreads >= Threads) Thread.Sleep(50);
 
                 ThreadCompletionSource tcs = new();
                 tcs.Finished += () => { openThreads -= 1; };

@@ -33,6 +33,9 @@ namespace Tourmaline.Scripts
             [CommandOption("-d|--dev-mode")]
             public bool? DevMode { get; init; }
 
+            [CommandOption("-t")]
+            public short? Threads { get; init; }
+
             [Description("Makes the outfile bare so it only contains paths.")]
             [CommandOption("--outfile-bare")]
             public bool? OutfileBare { get; init; }
@@ -50,6 +53,7 @@ namespace Tourmaline.Scripts
                 .AddRow("Creator(s)", "Jewels")
                 .AddRow("Mode", "Spider")
                 .AddRow("URL", settings.URL)
+                .AddRow("Threads", settings.Threads?.ToString() ?? "1")
                 .AddRow("Outfile?", settings.OutfilePath ?? "null")
                 .AddRow("Max paths?", settings.MaxPaths?.ToString() ?? "null")
                 .AddRow("Dev mode?", settings.DevMode?.ToString() ?? false.ToString())
@@ -69,10 +73,11 @@ namespace Tourmaline.Scripts
 
                 ctx.Status = "Configuring agent...";
                 if (settings.MaxPaths is not null) agent.MaxPaths = settings.MaxPaths;
-                if (settings.DevMode is not null && settings.DevMode == true) agent.DevMode = (bool)settings.DevMode;
-                if (settings.OutfileBare is not null && settings.OutfileBare == true) agent.BareOutfile = (bool)settings.OutfileBare;
+                if (settings.DevMode is not null) agent.DevMode = (bool)settings.DevMode;
+                if (settings.OutfileBare is not null) agent.BareOutfile = (bool)settings.OutfileBare;
                 if (settings.Regex is not null) agent.Regex = new(settings.Regex);
                 if (settings.IgnoreRegex is not null) agent.IgnoreRegex = new(settings.IgnoreRegex);
+                if (settings.Threads is not null) agent.Threads = (short)settings.Threads;
                 await Task.Delay(1000);
 
                 ctx.Status = "Finished";
