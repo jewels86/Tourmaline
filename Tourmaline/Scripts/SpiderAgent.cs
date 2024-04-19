@@ -22,10 +22,13 @@ namespace Tourmaline.Scripts
 
         public async Task<List<Path>> Start(Action<Path>? next = null)
         {
-            List<Path> paths = new();
+            List<Path> output = new();
             List<string> strpaths = new();
             HttpClient client = new();
             Queue<string> queue = new();
+
+            HttpResponseMessage[] responses = new HttpResponseMessage[Threads];
+            Path[] paths = new Path[Threads];
 
             object pathsLock = new();
             object strpathsLock = new();
@@ -43,8 +46,9 @@ namespace Tourmaline.Scripts
 
             queue.Enqueue(URL);
 
-            async void thread() 
+            async void thread(int tn) 
             {
+                // tn = Thread Number
                 while (true)
                 {
                     try
@@ -72,21 +76,21 @@ namespace Tourmaline.Scripts
                             strpaths.Add(address);
                         }
 
-                        HttpResponseMessage response = await client.GetAsync(address);
+                        responses[tn] = await client.GetAsync(address);
 
-                        Path path = new()
+                        paths[tn] = new()
                         {
                             URL = address,
-                            Status = (int)response.StatusCode,
-                            Type = response.Content.Headers.ContentType?.MediaType ?? "unknown"
+                            Status = (int)responses[tn].StatusCode,
+                            Type = responses[tn].Content.Headers.ContentType?.MediaType ?? "unknown"
                         };
 
-                        if (path.Status > 400)
+                        if (paths[tn].Status > 400)
                             continue;
 
-                        if (path.Type.Contains("html"))
+                        if (paths[tn].Type.Contains("html"))
                         {
-                            string html = await response.Content.ReadAsStringAsync();
+                            string html = await responses[tn].Content.ReadAsStringAsync();
                             Regex regex = new(@"(src|href|action)=""([a-zA-Z0-9\\\/\.?!#,=:;&% ]+)""");
                             MatchCollection matches = regex.Matches(html);
                             foreach(Match match in matches)
@@ -95,9 +99,9 @@ namespace Tourmaline.Scripts
                             }
                             
                         }
-                        else if (path.Type.Contains("text"))
+                        else if (paths[tn].Type.Contains("text"))
                         {
-                            string text = await response.Content.ReadAsStringAsync();
+                            string text = await responses[tn].Content.ReadAsStringAsync();
                             Regex regex = new(@"['""]([a-zA-Z0-9\\\/\.?!#,=:;&% ]+[\\\/\.][a-zA-Z0-9\\\/\.?!#,=:;&% ]+)['""]");
                             MatchCollection matches = regex.Matches(@"['""]([a-zA-Z0-9\\\/\.?!#,=:;&% ]+[\\\/\.][a-zA-Z0-9\\\/\.?!#,=:;&% ]+)['""]");
                             foreach (Match match in matches)
@@ -109,10 +113,10 @@ namespace Tourmaline.Scripts
 
                         if ((Regex?.IsMatch(address) ?? true) == true && (IgnoreRegex?.IsMatch(address) ?? false) == false)
                         {
-                            next?.Invoke(path); paths.Add(path);
+                            next?.Invoke(paths[tn]); output.Add(paths[tn]);
                         }
                         lock (iLock) i++;
-                        response.Dispose();
+                        responses[tn].Dispose();
                     } 
                     catch
                     {
@@ -126,7 +130,7 @@ namespace Tourmaline.Scripts
             for (int j = 0; j < Threads; j++)
             {
                 await Task.Delay(10);
-                tasks[j] = new Task(thread);
+                tasks[j] = new Task(() => thread(j));
                 tasks[j].Start();
             }
             while (queue.Count > 0 || waitFM) 
@@ -139,7 +143,7 @@ namespace Tourmaline.Scripts
             if (OutfilePath != null)
             {
                 File.Create(OutfilePath);
-                Path[] array = paths.ToArray();
+                Path[] array = output.ToArray();
                 string[] realArray = [];
 
                 int k = 0;
@@ -163,7 +167,7 @@ namespace Tourmaline.Scripts
             }
 
             client.Dispose();
-            return paths;
+            return output;
         }
 
         internal void ProcessURL(ref string url, bool isBaseURL = false)
