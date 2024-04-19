@@ -13,7 +13,7 @@ namespace Tourmaline.Scripts
         public bool BareOutfile { get; set; } = false;
         public Regex? Regex { get; set; }
         public Regex? IgnoreRegex { get; set; }
-        public short Threads { get; set; } = 1;
+        public short Threads { get; set; } = 4;
 
         public SpiderAgent(string url) 
         {
@@ -130,7 +130,7 @@ namespace Tourmaline.Scripts
             for (int j = 0; j < Threads; j++)
             {
                 await Task.Delay(10);
-                tasks[j] = new Task(() => thread(j));
+                tasks[j] = new Task(() => thread(j - 1));
                 tasks[j].Start();
             }
             while (queue.Count > 0 || waitFM) 

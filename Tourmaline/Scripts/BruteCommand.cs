@@ -40,11 +40,12 @@ namespace Tourmaline.Scripts
         {
             Table table = new();
             table.AddColumns("[Blue]Tourmaline[/]", "");
-            table.AddRow("Lincense", "GPL v3")
+            table.AddRow("License", "GPL v3")
                 .AddRow("Creator(s)", "Jewels")
                 .AddRow("Mode", "Brute")
                 .AddRow("URL", settings.URL)
                 .AddRow("Wordlist", settings.WordlistPath.Split("/")[settings.WordlistPath.Split("/").Length - 1])
+                .AddRow("Threads", settings.Threads?.ToString() ?? "4")
                 .AddRow("Dev mode?", settings.DevMode?.ToString() ?? false.ToString())
                 .AddRow("Outfile?", settings.OutfilePath ?? false.ToString());
             table.Width(100);

@@ -49,11 +49,11 @@ namespace Tourmaline.Scripts
         {
             Table table = new();
             table.AddColumns("[Blue]Tourmaline[/]", "");
-            table.AddRow("Lincense", "GPL v3")
+            table.AddRow("License", "GPL v3")
                 .AddRow("Creator(s)", "Jewels")
                 .AddRow("Mode", "Spider")
                 .AddRow("URL", settings.URL)
-                .AddRow("Threads", settings.Threads?.ToString() ?? "1")
+                .AddRow("Threads", settings.Threads?.ToString() ?? "4")
                 .AddRow("Outfile?", settings.OutfilePath ?? "null")
                 .AddRow("Max paths?", settings.MaxPaths?.ToString() ?? "null")
                 .AddRow("Dev mode?", settings.DevMode?.ToString() ?? false.ToString())
