@@ -74,24 +74,21 @@
             }
 
             short openThreads = 0;
-            Thread[] threads = new Thread[Threads];
+            Task[] tasks = new Task[Threads];
             while (queue.Count - 1 > 0)
             {
-                while (openThreads >= Threads) Thread.Sleep(50);
+                while (openThreads >= tasks.Length) await Task.Delay(50);
 
                 ThreadCompletionSource tcs = new();
                 tcs.Finished += () => { openThreads -= 1; };
-                threads[openThreads] = new(() => thread(tcs))
-                {
-                    Name = "Tourmaline Brute"
-                };
-                threads[openThreads].Start();
+                tasks[openThreads] = new(() => thread(tcs));
+                tasks[openThreads].Start();
 
                 openThreads++;
             }
-            foreach (Thread _thread in threads)
+            foreach (Task task in tasks)
             {
-                _thread.Join();
+                task.Wait();
             }
 
             if (OutfilePath != null)

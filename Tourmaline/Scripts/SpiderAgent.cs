@@ -52,21 +52,23 @@ namespace Tourmaline.Scripts
                         lock (iLock) if ((MaxPaths is not null ? true : i <= MaxPaths) == true) 
                                 return;
                         string address;
+                        if (queue.Count == 0 && !waitFM)
+                            return;
+                        else if (waitFM) while (waitFM && queue.Count == 0)
+                                await Task.Delay(50);
                         lock (queueLock)
                         {
-                            if (queue.Count == 0 && !waitFM) 
-                                return;
-                            else if (waitFM) while (waitFM && queue.Count == 0) 
-                                    Thread.Sleep(50);
                             address = queue.Dequeue();
-                            waitFM = true;
+                            if (queue.Count == 0)waitFM = true;
                         }
 
                         ProcessURL(ref address);
+
+                        if (strpaths.Contains(address) || !address.Contains(CutURLToDomain(URL))) 
+                            continue;
+
                         lock (strpathsLock)
                         {
-                            if (strpaths.Contains(address) || !address.Contains(CutURLToDomain(address))) 
-                                continue;
                             strpaths.Add(address);
                         }
 
@@ -89,7 +91,7 @@ namespace Tourmaline.Scripts
                             MatchCollection matches = regex.Matches(html);
                             foreach(Match match in matches)
                             {
-                                lock (queueLock) queue.Enqueue(match.Groups[1].ToString());
+                                lock (queueLock) queue.Enqueue(match.Groups[2].ToString());
                             }
                             
                         }
@@ -101,6 +103,7 @@ namespace Tourmaline.Scripts
                             foreach (Match match in matches)
                             {
                                 lock (queueLock) queue.Enqueue(match.Groups[0].ToString());
+                                await Task.Delay(10);
                             }
                         }
 
@@ -119,21 +122,18 @@ namespace Tourmaline.Scripts
                 }
             }
 
-            Thread[] threads = new Thread[Threads];
+            Task[] tasks = new Task[Threads];
             for (int j = 0; j < Threads; j++)
             {
-                Thread.Sleep(10);
-                threads[j] = new(thread)
-                {
-                    Name = "Tourmaline Spider"
-                };
-                threads[j].Start();
+                await Task.Delay(10);
+                tasks[j] = new Task(thread);
+                tasks[j].Start();
             }
             while (queue.Count > 0 || waitFM) 
-                Thread.Sleep(50);
-            foreach (Thread _thread in threads)
+                await Task.Delay(50);
+            foreach (Task task in tasks)
             {
-                _thread.Join();
+                task.Wait();
             }
 
             if (OutfilePath != null)
@@ -158,7 +158,6 @@ namespace Tourmaline.Scripts
                         k++;
                     }
                 }
-                
 
                 File.WriteAllLines(OutfilePath, realArray);
             }
