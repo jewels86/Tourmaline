@@ -6,6 +6,7 @@ namespace Tourmaline.Scripts
     public class SpiderAgent(string url)
     {
         public string URL { get; set; } = url;
+        public ushort? StrayValue { get; set; }
         public int? RateLimit { get; set; }
         public ulong? MaxPaths { get; set; }
         public bool DevMode { get; set; } = false;
@@ -13,7 +14,7 @@ namespace Tourmaline.Scripts
         public bool BareOutfile { get; set; } = false;
         public Regex? Regex { get; set; }
         public Regex? IgnoreRegex { get; set; }
-        public short Threads { get; set; } = 4;
+        public ushort Threads { get; set; } = 4;
 
         public async Task<List<Path>> Start(Action<Path>? next = null)
         {
@@ -25,6 +26,7 @@ namespace Tourmaline.Scripts
             HttpResponseMessage[] responses = new HttpResponseMessage[Threads];
             Path[] paths = new Path[Threads];
             string[] addresses = new string[Threads];
+            if (StrayValue is not null) { Path[] parents = new Path[Threads]; }
 
             object pathsLock = new();
             object strpathsLock = new();
@@ -40,7 +42,7 @@ namespace Tourmaline.Scripts
             tmp = new(URL);
             ProcessURL(ref tmp);
             URL = tmp.ToString();
-            if (await VerifySite() == false) 
+            if (await VerifySite() == false)
                 throw new Exception("The base page of the site either returned a non success status code or is not of type 'text/html'");
 
             queue.Enqueue(URL);

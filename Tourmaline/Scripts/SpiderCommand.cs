@@ -34,7 +34,10 @@ namespace Tourmaline.Scripts
             public bool? DevMode { get; init; }
 
             [CommandOption("-t")]
-            public short? Threads { get; init; }
+            public ushort? Threads { get; init; }
+
+            [CommandOption("-s")]
+            public ushort? StrayValue { get; init; }
 
             [Description("Makes the outfile bare so it only contains paths.")]
             [CommandOption("--outfile-bare")]
@@ -56,6 +59,7 @@ namespace Tourmaline.Scripts
                 .AddRow("Threads", settings.Threads?.ToString() ?? "4")
                 .AddRow("Outfile?", settings.OutfilePath ?? "")
                 .AddRow("Max paths?", settings.MaxPaths?.ToString() ?? "")
+                .AddRow("Stray Value?", settings.StrayValue?.ToString() ?? "")
                 .AddRow("Dev mode?", settings.DevMode?.ToString() ?? false.ToString())
                 .AddRow("Regex?", settings.Regex is not null ? new StringBuilder(settings.Regex).Replace("[", "[[").Replace("]", "]]").ToString() : "")
                 .AddRow("Ignore Regex?", settings.IgnoreRegex is not null ? new StringBuilder(settings.IgnoreRegex).Replace("[", "[[").Replace("]", "]]").ToString() : "");
@@ -72,12 +76,13 @@ namespace Tourmaline.Scripts
                 await Task.Delay(200);
 
                 ctx.Status = "Configuring agent...";
-                if (settings.MaxPaths is not null) agent.MaxPaths = settings.MaxPaths;
-                if (settings.DevMode is not null) agent.DevMode = (bool)settings.DevMode;
-                if (settings.OutfileBare is not null) agent.BareOutfile = (bool)settings.OutfileBare;
-                if (settings.Regex is not null) agent.Regex = new(settings.Regex);
-                if (settings.IgnoreRegex is not null) agent.IgnoreRegex = new(settings.IgnoreRegex);
-                if (settings.Threads is not null) agent.Threads = (short)settings.Threads;
+                agent.MaxPaths = settings.MaxPaths ?? null;
+                agent.DevMode = settings.DevMode ?? false;
+                agent.BareOutfile = settings.OutfileBare ?? false;
+                agent.Regex = settings.Regex is not null ? new(settings.Regex) : null;
+                agent.IgnoreRegex = settings.IgnoreRegex is not null ? new(settings.IgnoreRegex) : null;
+                agent.Threads = settings.Threads ?? 4;
+                agent.StrayValue = settings.StrayValue ?? null;
                 await Task.Delay(1000);
 
                 ctx.Status = "Finished";
