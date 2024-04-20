@@ -29,7 +29,7 @@ namespace Tourmaline.Scripts
             [CommandOption("-o")]
             public string? OutfilePath { get; init; }
 
-            [Description("Initates dev mode")]
+            [Description("Initiates dev mode")]
             [CommandOption("-d|--dev-mode")]
             public bool? DevMode { get; init; }
 
@@ -54,11 +54,11 @@ namespace Tourmaline.Scripts
                 .AddRow("Mode", "Spider")
                 .AddRow("URL", settings.URL)
                 .AddRow("Threads", settings.Threads?.ToString() ?? "4")
-                .AddRow("Outfile?", settings.OutfilePath ?? "null")
-                .AddRow("Max paths?", settings.MaxPaths?.ToString() ?? "null")
+                .AddRow("Outfile?", settings.OutfilePath ?? "")
+                .AddRow("Max paths?", settings.MaxPaths?.ToString() ?? "")
                 .AddRow("Dev mode?", settings.DevMode?.ToString() ?? false.ToString())
-                .AddRow("Regex?", settings.Regex is not null ? new StringBuilder(settings.Regex).Replace("[", "[[").Replace("]", "]]").ToString() : "null")
-                .AddRow("Ignore Regex?", settings.IgnoreRegex is not null ? new StringBuilder(settings.IgnoreRegex).Replace("[", "[[").Replace("]", "]]").ToString() : "null");
+                .AddRow("Regex?", settings.Regex is not null ? new StringBuilder(settings.Regex).Replace("[", "[[").Replace("]", "]]").ToString() : "")
+                .AddRow("Ignore Regex?", settings.IgnoreRegex is not null ? new StringBuilder(settings.IgnoreRegex).Replace("[", "[[").Replace("]", "]]").ToString() : "");
             table.Width(100);
             AnsiConsole.Write(table);
 

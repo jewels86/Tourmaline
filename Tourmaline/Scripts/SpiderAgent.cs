@@ -1,11 +1,11 @@
+using System.Text;
 using System.Text.RegularExpressions;
-using Spectre.Console;
 
 namespace Tourmaline.Scripts 
 {
-    public class SpiderAgent
+    public class SpiderAgent(string url)
     {
-        public string URL { get; set; }
+        public string URL { get; set; } = url;
         public int? RateLimit { get; set; }
         public ulong? MaxPaths { get; set; }
         public bool DevMode { get; set; } = false;
@@ -15,32 +15,31 @@ namespace Tourmaline.Scripts
         public Regex? IgnoreRegex { get; set; }
         public short Threads { get; set; } = 4;
 
-        public SpiderAgent(string url) 
-        {
-            URL = url;
-        }
-
         public async Task<List<Path>> Start(Action<Path>? next = null)
         {
-            List<Path> output = new();
-            List<string> strpaths = new();
+            List<Path> output = [];
+            List<string> strpaths = [];
             HttpClient client = new();
             Queue<string> queue = new();
 
             HttpResponseMessage[] responses = new HttpResponseMessage[Threads];
             Path[] paths = new Path[Threads];
+            string[] addresses = new string[Threads];
 
             object pathsLock = new();
             object strpathsLock = new();
             object queueLock = new();
             object iLock = new();
+            object tmpLock = new();
+
+            StringBuilder tmp;
 
             ulong i = 0;
             bool waitFM = false; // Wait for more/me
 
-            string _tmp = URL;
-            ProcessURL(ref _tmp);
-            URL = _tmp;
+            tmp = new(URL);
+            ProcessURL(ref tmp);
+            URL = tmp.ToString();
             if (await VerifySite() == false) 
                 throw new Exception("The base page of the site either returned a non success status code or is not of type 'text/html'");
 
@@ -53,34 +52,39 @@ namespace Tourmaline.Scripts
                 {
                     try
                     {
-                        lock (iLock) if ((MaxPaths is not null ? true : i <= MaxPaths) == true) 
+                        lock (iLock) if ((MaxPaths is not null || i <= MaxPaths) == true) 
                                 return;
-                        string address;
                         if (queue.Count == 0 && !waitFM)
                             return;
                         else if (waitFM) while (waitFM && queue.Count == 0)
                                 await Task.Delay(50);
                         lock (queueLock)
                         {
-                            address = queue.Dequeue();
-                            if (queue.Count == 0)waitFM = true;
+                            addresses[tn] = queue.Dequeue();
+                            if (queue.Count == 0) waitFM = true;
                         }
 
-                        ProcessURL(ref address);
+                        lock (tmpLock)
+                        {
+                            tmp = new(addresses[tn]);
+                            ProcessURL(ref tmp);
+                            addresses[tn] = tmp.ToString();
+                        }
+                        
 
-                        if (strpaths.Contains(address) || !address.Contains(CutURLToDomain(URL))) 
+                        if (strpaths.Contains(addresses[tn]) || !addresses[tn].Contains(CutURLToDomain(URL))) 
                             continue;
 
                         lock (strpathsLock)
                         {
-                            strpaths.Add(address);
+                            strpaths.Add(addresses[tn].ToString());
                         }
 
-                        responses[tn] = await client.GetAsync(address);
+                        responses[tn] = await client.GetAsync(addresses[tn]);
 
                         paths[tn] = new()
                         {
-                            URL = address,
+                            URL = addresses[tn],
                             Status = (int)responses[tn].StatusCode,
                             Type = responses[tn].Content.Headers.ContentType?.MediaType ?? "unknown"
                         };
@@ -96,6 +100,7 @@ namespace Tourmaline.Scripts
                             foreach(Match match in matches)
                             {
                                 lock (queueLock) queue.Enqueue(match.Groups[2].ToString());
+                                waitFM = false;
                             }
                             
                         }
@@ -107,11 +112,11 @@ namespace Tourmaline.Scripts
                             foreach (Match match in matches)
                             {
                                 lock (queueLock) queue.Enqueue(match.Groups[0].ToString());
-                                await Task.Delay(10);
+                                waitFM = false;
                             }
                         }
 
-                        if ((Regex?.IsMatch(address) ?? true) == true && (IgnoreRegex?.IsMatch(address) ?? false) == false)
+                        if ((Regex?.IsMatch(addresses[tn]) ?? true) == true && (IgnoreRegex?.IsMatch(addresses[tn]) ?? false) == false)
                         {
                             next?.Invoke(paths[tn]); output.Add(paths[tn]);
                         }
@@ -122,7 +127,7 @@ namespace Tourmaline.Scripts
                     {
                         if (DevMode) throw;
                     }
-                    waitFM = false;
+                    
                 }
             }
 
@@ -143,7 +148,7 @@ namespace Tourmaline.Scripts
             if (OutfilePath != null)
             {
                 File.Create(OutfilePath);
-                Path[] array = output.ToArray();
+                Path[] array = [.. output];
                 string[] realArray = [];
 
                 int k = 0;
@@ -170,27 +175,28 @@ namespace Tourmaline.Scripts
             return output;
         }
 
-        internal void ProcessURL(ref string url, bool isBaseURL = false)
+        internal void ProcessURL(ref StringBuilder url, bool isBaseURL = false)
         {
-            if (url.StartsWith("/") && !isBaseURL)
+            if (url[0] == '/' && !isBaseURL)
             {
-                url = URL + url;
+                url.Insert(0, URL);
             }
 
-            url = url.StartsWith("http://") ? url.Substring(7) : url;
-            url = url.StartsWith("https://") ? url.Substring(8) : url;
-            url = url.StartsWith("www.") ? url.Substring(4) : url;
-            url = $"http://{url}";
-            string[] parts = url.Split('#', '?');
-            url = parts[0];
+            url.Replace("http://", "");
+            url.Replace("https://", "");
+            url.Replace("www.", "");
+
+            url.Insert(0, "http://");
+
+            string[] parts = url.ToString().Split('#', '?');
+            url = new(parts[0]);
             
         }
         internal string CutURLToDomain(string url)
         {
-            string output = url;
+            StringBuilder output = new(url);
             ProcessURL(ref output);
-            string[] parts = output.Split("/");
-            return parts[2];
+            return output.ToString().Split("/")[2];
         }
         private async Task<bool> VerifySite()
         {

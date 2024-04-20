@@ -44,7 +44,7 @@ namespace Tourmaline.Scripts
                 .AddRow("Creator(s)", "Jewels")
                 .AddRow("Mode", "Brute")
                 .AddRow("URL", settings.URL)
-                .AddRow("Wordlist", settings.WordlistPath.Split("/")[settings.WordlistPath.Split("/").Length - 1])
+                .AddRow("Wordlist", settings.WordlistPath.Split("/")[^1])
                 .AddRow("Threads", settings.Threads?.ToString() ?? "4")
                 .AddRow("Dev mode?", settings.DevMode?.ToString() ?? false.ToString())
                 .AddRow("Outfile?", settings.OutfilePath ?? false.ToString());

@@ -29,8 +29,7 @@
             ProcessURL(ref _tmp, true);
             URL = _tmp;
 
-            var file = await File.ReadAllLinesAsync(WordlistPath);
-            queue = new(file);
+            queue = new(await File.ReadAllLinesAsync(WordlistPath));
 
             async void thread(ThreadCompletionSource tcs)
             {
