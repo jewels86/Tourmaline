@@ -18,6 +18,9 @@ namespace Tourmaline.Scripts
 
         public async Task<List<Path>> Start(Action<Path>? next = null)
         {
+            Regex jsPathFinder = new(@"['""]([a-zA-Z0-9\\\/\.?!#,=:;&% ]+[\\\/\.][a-zA-Z0-9\\\/\.?!#,=:;&% ]+)['""]");
+            Regex htmlPathFinder = new(@"(src|href|action)=""([a-zA-Z0-9\\\/\.?!#,=:;&% ]+)""");
+
             List<Path> output = [];
             List<string> strpaths = [];
             HttpClient client = new();
@@ -96,22 +99,16 @@ namespace Tourmaline.Scripts
 
                         if (paths[tn].Type.Contains("html"))
                         {
-                            string html = await responses[tn].Content.ReadAsStringAsync();
-                            Regex regex = new(@"(src|href|action)=""([a-zA-Z0-9\\\/\.?!#,=:;&% ]+)""");
-                            MatchCollection matches = regex.Matches(html);
-                            foreach(Match match in matches)
+                            foreach(Match match in htmlPathFinder.Matches(await responses[tn].Content.ReadAsStringAsync()))
                             {
                                 lock (queueLock) queue.Enqueue(match.Groups[2].ToString());
                                 waitFM = false;
                             }
                             
                         }
-                        else if (paths[tn].Type.Contains("text"))
+                        else if (paths[tn].Type.Contains("js"))
                         {
-                            string text = await responses[tn].Content.ReadAsStringAsync();
-                            Regex regex = new(@"['""]([a-zA-Z0-9\\\/\.?!#,=:;&% ]+[\\\/\.][a-zA-Z0-9\\\/\.?!#,=:;&% ]+)['""]");
-                            MatchCollection matches = regex.Matches(@"['""]([a-zA-Z0-9\\\/\.?!#,=:;&% ]+[\\\/\.][a-zA-Z0-9\\\/\.?!#,=:;&% ]+)['""]");
-                            foreach (Match match in matches)
+                            foreach (Match match in jsPathFinder.Matches(await responses[tn].Content.ReadAsStringAsync()))
                             {
                                 lock (queueLock) queue.Enqueue(match.Groups[0].ToString());
                                 waitFM = false;
