@@ -1,7 +1,7 @@
 # Tourmaline
 A tunable all-in-one directory enumeration tool.  
 Latest release: v1.0  
-Latest version: v1.13  
+Latest version: v1.15  
 ## Installation
 This installation process needs refinement, but this works for now.
 ### Linux
