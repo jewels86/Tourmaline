@@ -7,7 +7,7 @@ namespace Tourmaline.Scripts
     {
         public string URL { get; set; } = url;
         public ushort? StrayValue { get; set; }
-        public int? RateLimit { get; set; }
+        public uint? RateLimit { get; set; }
         public ulong? MaxPaths { get; set; }
         public bool DevMode { get; set; } = false;
         public string? OutfilePath { get; set; }
@@ -179,6 +179,10 @@ namespace Tourmaline.Scripts
             if (url[0] == '/' && !isBaseURL)
             {
                 url.Insert(0, URL);
+            }
+            if (url[url.Length - 1] == '/')
+            {
+                url.Remove(url.Length - 1, 1);
             }
 
             url.Replace("http://", "");
