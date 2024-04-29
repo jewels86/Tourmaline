@@ -7,7 +7,7 @@
         public string? OutfilePath { get; set; }
         public bool DevMode { get; set; } = false;
         public bool BareOutfile { get; set; } = false;
-        public short Threads { get; set; } = 4;
+        public ushort Threads { get; set; } = 4;
 
         internal BruteAgent(string wordlistPath, string url)
         {

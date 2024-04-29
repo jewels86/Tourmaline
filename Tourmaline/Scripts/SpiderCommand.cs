@@ -43,6 +43,7 @@ namespace Tourmaline.Scripts
 
 			[Description("Makes the outfile bare so it only contains paths.")]
 			[CommandOption("--outfile-bare")]
+			[DefaultValue(false)]
 			public bool? OutfileBare { get; init; }
 
 			[Description("Makes the output bare so it only shows paths.")]
@@ -55,7 +56,8 @@ namespace Tourmaline.Scripts
 		{
 			if (!settings.OutputBare)
 			{
-				FigletText figlet = new FigletText("Welcome to Tourmaline!")
+				AnsiConsole.WriteLine("Welcome to");
+				FigletText figlet = new FigletText("Tourmaline!")
 					.Color(Color.Blue);
 				AnsiConsole.Write(figlet);
 			}
@@ -66,12 +68,13 @@ namespace Tourmaline.Scripts
 				.AddRow("Mode", "Spider")
 				.AddRow("URL", settings.URL)
 				.AddRow("Threads", settings.Threads.ToString())
-				.AddRow("Outfile?", settings.OutfilePath ?? "")
-				.AddRow("Max paths?", settings.MaxPaths?.ToString() ?? "")
-				.AddRow("Stray Value?", settings.StrayValue?.ToString() ?? "")
-				.AddRow("Dev mode?", settings.DevMode.ToString())
-				.AddRow("Regex?", settings.Regex is not null ? new StringBuilder(settings.Regex).Replace("[", "[[").Replace("]", "]]").ToString() : "")
-				.AddRow("Ignore Regex?", settings.IgnoreRegex is not null ? new StringBuilder(settings.IgnoreRegex).Replace("[", "[[").Replace("]", "]]").ToString() : "");
+				.AddRow("Dev mode", settings.DevMode ? "Enabled":"Disabled");
+			if (settings.MaxPaths is not null) table.AddRow("Max Paths", ((ulong)settings.MaxPaths).ToString());
+			if (settings.Regex is not null) table.AddRow("Regex", settings.Regex.Replace("[", "[[").Replace("]", "]]"));
+			if (settings.IgnoreRegex is not null) table.AddRow("Ignore Regex", settings.IgnoreRegex.Replace("[", "[[").Replace("]", "]]"));
+			if (settings.OutputBare != false) table.AddRow("Bare Output", "True");
+			if (settings.OutfileBare != false) table.AddRow("Bare Outfile", "True");
+			if (settings.OutfilePath is not null) table.AddRow("Outfile", settings.OutfilePath);
 			table.Width(100);
 			if (!settings.OutputBare) AnsiConsole.Write(table);
 
@@ -80,16 +83,14 @@ namespace Tourmaline.Scripts
 			GUI gui = new();
 			SpiderAgent agent = new(settings.URL);
 
-			void setUp()
-			{
-				agent.MaxPaths = settings.MaxPaths ?? null;
-				agent.DevMode = settings.DevMode;
-				agent.BareOutfile = settings.OutfileBare ?? false;
-				agent.Regex = settings.Regex is not null ? new(settings.Regex) : null;
-				agent.IgnoreRegex = settings.IgnoreRegex is not null ? new(settings.IgnoreRegex) : null;
-				agent.Threads = settings.Threads;
-				agent.StrayValue = settings.StrayValue ?? null;
-			}
+
+			agent.MaxPaths = settings.MaxPaths ?? null;
+			agent.DevMode = settings.DevMode;
+			agent.BareOutfile = settings.OutfileBare ?? false;
+			agent.Regex = settings.Regex is not null ? new(settings.Regex) : null;
+			agent.IgnoreRegex = settings.IgnoreRegex is not null ? new(settings.IgnoreRegex) : null;
+			agent.Threads = settings.Threads;
+			agent.StrayValue = settings.StrayValue ?? null;
 
 			if (settings.OutputBare)
 			{
@@ -97,18 +98,6 @@ namespace Tourmaline.Scripts
 			}
 			else
 			{
-				await status.StartAsync("Starting...", async ctx =>
-				{
-					await Task.Delay(200);
-
-					ctx.Status = "Configuring agent...";
-					setUp();
-					await Task.Delay(1000);
-
-					ctx.Status = "Finished";
-					await Task.Delay(200);
-				});
-
 				string start = AnsiConsole.Prompt(
 					new SelectionPrompt<string>()
 						.Title("Ready?")
