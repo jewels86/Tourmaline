@@ -54,21 +54,14 @@ namespace Tourmaline.Scripts
 
 		public async override Task<int> ExecuteAsync(CommandContext context, Settings settings)
 		{
-			if (!settings.OutputBare)
-			{
-				AnsiConsole.WriteLine("Welcome to");
-				FigletText figlet = new FigletText("Tourmaline!")
-					.Color(Color.Blue);
-				AnsiConsole.Write(figlet);
-			}
 			Table table = new();
-			table.AddColumns("[Blue]Tourmaline[/]", "");
+			table.AddColumns("[Blue][bold]Tourmaline[/][/]", "");
 			table.AddRow("License", "GPL v3")
 				.AddRow("Creator(s)", "Jewels")
 				.AddRow("Mode", "Spider")
 				.AddRow("URL", settings.URL)
 				.AddRow("Threads", settings.Threads.ToString())
-				.AddRow("Dev mode", settings.DevMode ? "Enabled":"Disabled");
+				.AddRow("Dev mode", settings.DevMode ? "Enabled" : "Disabled");
 			if (settings.MaxPaths is not null) table.AddRow("Max Paths", ((ulong)settings.MaxPaths).ToString());
 			if (settings.Regex is not null) table.AddRow("Regex", settings.Regex.Replace("[", "[[").Replace("]", "]]"));
 			if (settings.IgnoreRegex is not null) table.AddRow("Ignore Regex", settings.IgnoreRegex.Replace("[", "[[").Replace("]", "]]"));
@@ -82,7 +75,6 @@ namespace Tourmaline.Scripts
 
 			GUI gui = new();
 			SpiderAgent agent = new(settings.URL);
-
 
 			agent.MaxPaths = settings.MaxPaths ?? null;
 			agent.DevMode = settings.DevMode;
