@@ -17,7 +17,8 @@ namespace Tourmaline
                 config.AddCommand<SpiderCommand>("spider");
                 config.AddCommand<BruteCommand>("brute");
                 config.AddCommand<BuilderCommand>("build");
-            });
+				config.AddCommand<EnumerateCommand>("enumerate");
+			});
             app.Run(args);
         }
     }

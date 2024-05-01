@@ -35,6 +35,9 @@ It is recommended to run the brute with multiple threads and at least twice, sin
 Flags:
 - `-t`: The number of threads to use during enumeration.
 
+### Enumerate
+This command combines many methods to find many paths.
+
 ### Build
 The build command is used to generate commands for tourmaline. You enter some information about the purpose and it gives you a command.
 
@@ -42,6 +45,7 @@ The build command is used to generate commands for tourmaline. You enter some in
 - Spider
     - Add stray value 
 - Add docs
+- - Make sure docs are accurate
 - Installations
     - Add package to `apt`
     - Fix windows installation
