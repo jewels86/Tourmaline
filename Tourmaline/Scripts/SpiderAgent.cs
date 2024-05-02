@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.RegularExpressions;
+using static Tourmaline.Scripts.Functions;
 
 namespace Tourmaline.Scripts 
 {
@@ -15,6 +16,7 @@ namespace Tourmaline.Scripts
         public Regex? Regex { get; set; }
         public Regex? IgnoreRegex { get; set; }
         public ushort Threads { get; set; } = 4;
+        public string[]? Found { get; set; }
 
         public async Task<List<Path>> Start(Action<Path>? next = null)
         {
@@ -35,20 +37,19 @@ namespace Tourmaline.Scripts
             object strpathsLock = new();
             object queueLock = new();
             object iLock = new();
-            object tmpLock = new();
-
-            StringBuilder tmp;
 
             ulong i = 0;
             bool waitFM = false; // Wait for more/me
 
-            tmp = new(URL);
-            ProcessURL(ref tmp);
-            URL = tmp.ToString();
-            if (await VerifySite() == false)
+            URL = ProcessURL(URL);
+            if (await VerifySite(URL) == false)
                 throw new Exception("The base page of the site either returned a non success status code or is not of type 'text/html'");
 
             queue.Enqueue(URL);
+            if (Found is not null) foreach (string str in Found)
+            {
+                queue.Enqueue(ProcessURL(str));
+            }
 
             async void thread(int tn) 
             {
@@ -69,12 +70,7 @@ namespace Tourmaline.Scripts
                             if (queue.Count == 0) waitFM = true;
                         }
 
-                        lock (tmpLock)
-                        {
-                            tmp = new(addresses[tn]);
-                            ProcessURL(ref tmp);
-                            addresses[tn] = tmp.ToString();
-                        }
+                        addresses[tn] = ProcessURL(addresses[tn], URL);
                         
 
                         if (strpaths.Contains(addresses[tn]) || !addresses[tn].Contains(CutURLToDomain(URL))) 
@@ -82,7 +78,7 @@ namespace Tourmaline.Scripts
 
                         lock (strpathsLock)
                         {
-                            strpaths.Add(addresses[tn].ToString());
+                            strpaths.Add(addresses[tn]);
                         }
 
                         responses[tn] = await client.GetAsync(addresses[tn]);
@@ -172,45 +168,6 @@ namespace Tourmaline.Scripts
 
             client.Dispose();
             return output;
-        }
-
-        internal void ProcessURL(ref StringBuilder url, bool isBaseURL = false)
-        {
-            if (url[0] == '/' && !isBaseURL)
-            {
-                url.Insert(0, URL);
-            }
-            if (url[url.Length - 1] == '/')
-            {
-                url.Remove(url.Length - 1, 1);
-            }
-
-            url.Replace("http://", "");
-            url.Replace("https://", "");
-            url.Replace("www.", "");
-
-            url.Insert(0, "http://");
-
-            string[] parts = url.ToString().Split('#', '?');
-            url = new(parts[0]);
-            
-        }
-        internal string CutURLToDomain(string url)
-        {
-            StringBuilder output = new(url);
-            ProcessURL(ref output);
-            return output.ToString().Split("/")[2];
-        }
-        private async Task<bool> VerifySite()
-        {
-            HttpClient client = new();
-            HttpResponseMessage response = await client.GetAsync(URL);
-            if (!response.IsSuccessStatusCode || response.Content.Headers.ContentType?.MediaType != "text/html")
-            {
-                return false;
-            }
-
-            return true;
         }
     }
 }

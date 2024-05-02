@@ -11,6 +11,14 @@
 	<PropertyGroup>
 		
 	</PropertyGroup>
+	
+	<ItemGroup>
+	  <None Remove="Wordlists\CMS\WordPress.txt" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <Compile Include="Wordlists\CMS\WordPress.txt" />
+	</ItemGroup>
 
   <ItemGroup>
 	  <PackageReference Include="HtmlAgilityPack" Version="1.11.6" />

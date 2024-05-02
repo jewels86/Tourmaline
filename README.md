@@ -1,7 +1,7 @@
 # Tourmaline
 A tunable all-in-one directory enumeration tool.  
-Latest release: v1.0  
-Latest version: v1.15  
+Latest release: v1.13  
+
 ## Installation
 This installation process needs refinement, but this works for now.
 ### Linux
@@ -44,6 +44,7 @@ The build command is used to generate commands for tourmaline. You enter some in
 ## Todos
 - Spider
     - Add stray value 
+- Finish CMS identifier
 - Add docs
 - - Make sure docs are accurate
 - Installations
