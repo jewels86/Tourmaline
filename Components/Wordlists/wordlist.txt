@@ -1,0 +1,7 @@
+about
+
+css
+preferences
+img
+js
+robots.txt

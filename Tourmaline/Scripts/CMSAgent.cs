@@ -23,65 +23,77 @@ namespace Tourmaline.Scripts
 			URL = ProcessURL(URL);
 
 			HttpClient client = new();
-			HttpResponseMessage tmpmsg;
+			HttpResponseMessage? tmpmsg = null;
 			List<string> wordlist = [];
 
 			// WordPress 
-			wordlist = new(File.ReadAllLines("wordlists/CMS/WordPress.txt"));
-			foreach (string word in wordlist)
+			try
 			{
-				tmpmsg = await client.GetAsync($"{URL}/{word}");
-				if (tmpmsg.IsSuccessStatusCode)
+				wordlist = new(File.ReadAllLines("Wordlists/CMS/WordPress.txt"));
+				foreach (string word in wordlist)
 				{
-					if ((await tmpmsg.Content.ReadAsStringAsync()).Contains("Word Press"))
+					tmpmsg = await client.GetAsync($"{URL}/{word}");
+					if (tmpmsg.IsSuccessStatusCode)
 					{
-						client.Dispose();
-						tmpmsg.Dispose();
-						return CMS.WordPress;
+						if ((await tmpmsg.Content.ReadAsStringAsync()).Contains("Word Press"))
+						{
+							tmpmsg.Dispose();
+							return CMS.WordPress;
+						}
 					}
 				}
-			}
+			} catch { }
 
 			// Google Sites
-			tmpmsg = await client.GetAsync(URL);
-			if ((await tmpmsg.Content.ReadAsStringAsync()).Contains("Google Sites")) 
+			try
 			{
-				client.Dispose();
-				tmpmsg.Dispose();
-				return CMS.GoogleSites; 
-			}
+				tmpmsg = await client.GetAsync(URL);
+				if ((await tmpmsg.Content.ReadAsStringAsync()).Contains("Google Sites"))
+				{
+					client.Dispose();
+					tmpmsg.Dispose();
+					return CMS.GoogleSites;
+				}
+			} catch { }
 
 			client.Dispose();
-			tmpmsg.Dispose();
+			tmpmsg?.Dispose();
 			return CMS.Unknown;
 		}
 
 		internal async Task<List<Path>> Exploit(CMS cms)
 		{
 			HttpClient client = new();
-			HttpResponseMessage msg;
+			HttpResponseMessage? msg = null;
 			Path path;
 			string tmp;
 			List<Path> output = [];
-			foreach (string str in File.ReadAllLines($"wordlists/CMS/{cms}.txt"))
+			foreach (string str in File.ReadAllLines($"Wordlists/CMS/{cms}.txt"))
 			{
-				tmp = ProcessURL(str, URL);
-				msg = await client.GetAsync(tmp);
-				path = new()
+				try
 				{
-					Status = (int)msg.StatusCode,
-					Type = msg.Content.Headers.ContentType?.MediaType ?? "unknown",
-					URL = tmp
-				};
+					tmp = ProcessURL(str, URL);
+					msg = await client.GetAsync(tmp);
+					path = new()
+					{
+						Status = (int)msg.StatusCode,
+						Type = msg.Content.Headers.ContentType?.MediaType ?? "unknown",
+						URL = tmp
+					};
 
-				msg.Dispose();
+					msg.Dispose();
+					
+					if (msg.IsSuccessStatusCode)
+					{
+						continue;
+					}
 
-				if (msg.IsSuccessStatusCode)
-				{
-					continue;
+					output.Add(path);
 				}
-
-				output.Add(path);
+				catch
+				{
+					msg?.Dispose();
+				}
 			}
 			client.Dispose();
 			return output;

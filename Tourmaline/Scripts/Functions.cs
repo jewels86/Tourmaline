@@ -37,16 +37,26 @@ namespace Tourmaline.Scripts
 		internal static async Task<bool> VerifySite(string url)
 		{
 			HttpClient client = new();
-			HttpResponseMessage response = await client.GetAsync(url);
-			if (!response.IsSuccessStatusCode || response.Content.Headers.ContentType?.MediaType != "text/html")
+			HttpResponseMessage? response = null;
+			try
 			{
+				response = await client.GetAsync(url);
+				if (!response.IsSuccessStatusCode || response.Content.Headers.ContentType?.MediaType != "text/html")
+				{
+					return false;
+				}
+
+				client.Dispose();
+				response.Dispose();
+
+				return true;
+			}
+			catch
+			{
+				client.Dispose();
+				response?.Dispose();
 				return false;
 			}
-
-			client.Dispose();
-			response.Dispose();
-
-			return true;
 		}
 	}
 }

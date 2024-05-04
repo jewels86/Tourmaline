@@ -14,10 +14,7 @@
 	
 	<ItemGroup>
 	  <None Remove="Wordlists\CMS\WordPress.txt" />
-	</ItemGroup>
-	
-	<ItemGroup>
-	  <Compile Include="Wordlists\CMS\WordPress.txt" />
+	  <None Remove="Wordlists\wordlist.txt" />
 	</ItemGroup>
 
   <ItemGroup>
@@ -27,12 +24,41 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="init.ps1">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="init.sh">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+	<Resource Include="Wordlists\CMS\WordPress.txt">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Resource>
+	<Resource Include="Wordlists\wordlist.txt">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Resource>
   </ItemGroup>
+
+  <ItemGroup>
+	<Compile Update="Properties\Resources.Designer.cs">
+	  <DesignTime>True</DesignTime>
+	  <AutoGen>True</AutoGen>
+	  <DependentUpon>Resources.resx</DependentUpon>
+	</Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+	<EmbeddedResource Update="Properties\Resources.resx">
+	  <Generator>ResXFileCodeGenerator</Generator>
+	  <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+	</EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+	<None Update="init.ps1">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</None>
+	<None Update="init.sh">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</None>
+  </ItemGroup>
+	<ItemGroup>
+		<Content Include="Wordlists\**">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
 </Project>
