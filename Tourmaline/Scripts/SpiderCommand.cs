@@ -14,7 +14,7 @@ namespace Tourmaline.Scripts
 			public required string URL { get; init; }
 
 			[Description("The max amount of paths to search")]
-			[CommandOption("-m|--max-paths")]
+			[CommandOption("-m")]
 			public ulong? MaxPaths { get; init; }
 
 			[Description("Regex all paths must pass.")]
@@ -37,9 +37,6 @@ namespace Tourmaline.Scripts
 			[CommandOption("-t")]
 			[DefaultValue((ushort)4)]
 			public ushort Threads { get; init; }
-
-			[CommandOption("-s")]
-			public ushort? StrayValue { get; init; }
 
 			[Description("Makes the outfile bare so it only contains paths.")]
 			[CommandOption("--outfile-bare")]
@@ -82,7 +79,6 @@ namespace Tourmaline.Scripts
 			agent.Regex = settings.Regex is not null ? new(settings.Regex) : null;
 			agent.IgnoreRegex = settings.IgnoreRegex is not null ? new(settings.IgnoreRegex) : null;
 			agent.Threads = settings.Threads;
-			agent.StrayValue = settings.StrayValue ?? null;
 
 			if (settings.OutputBare)
 			{

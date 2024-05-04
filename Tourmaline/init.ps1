@@ -1,3 +1,4 @@
 echo Initializing...; 
-Set-Alias -Name tourmaline -Value $PWD/Tourmaline; 
+echo "Set-Alias tourmaline ${$PWD}/Tourmaline" >> $profile;
+. $profile; 
 echo Finished.;
