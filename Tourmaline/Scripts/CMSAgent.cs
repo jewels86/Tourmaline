@@ -10,7 +10,7 @@ namespace Tourmaline.Scripts
 	internal class CMSAgent
 	{
 		internal string URL { get; set; }
-
+		internal double Accuracy { get; set; } = 60.00;
 		internal CMSAgent(string url)
 		{
 			URL = url;
@@ -25,24 +25,37 @@ namespace Tourmaline.Scripts
 			HttpClient client = new();
 			HttpResponseMessage? tmpmsg = null;
 			List<string> wordlist = [];
+			double percentage;
 
-			// WordPress 
-			try
+			async Task<bool> check(string word)
 			{
-				wordlist = new(File.ReadAllLines("Wordlists/CMS/WordPress.txt"));
-				foreach (string word in wordlist)
+				try
 				{
 					tmpmsg = await client.GetAsync($"{URL}/{word}");
+					tmpmsg.Dispose();
 					if (tmpmsg.IsSuccessStatusCode)
 					{
-						if ((await tmpmsg.Content.ReadAsStringAsync()).Contains("Word Press"))
-						{
-							tmpmsg.Dispose();
-							return CMS.WordPress;
-						}
+						return true;
 					}
+					return false;
+				} 
+				catch
+				{
+					return false;
 				}
-			} catch { }
+			}
+
+			// WordPress
+			percentage = 0;
+			wordlist = new(File.ReadAllLines("Wordlists/CMS/WordPress.txt"));
+			foreach (string word in wordlist)
+			{
+				if (await check(word))
+				{
+					percentage += 100 / wordlist.Count;
+				}
+			}
+			if (percentage >= Accuracy) return CMS.WordPress;
 
 			// Google Sites
 			try

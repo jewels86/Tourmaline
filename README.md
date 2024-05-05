@@ -1,7 +1,8 @@
 # Tourmaline
 A tunable all-in-one directory enumeration tool.  
 Latest release: v1.13
-
+## Credits
+`wordlist.txt` is from [`dirb common.txt`](https://github.com/3ndG4me/KaliLists/blob/master/dirb/common.txt).
 ## Installation
 This installation process needs refinement, but this works for now.
 ### Linux
