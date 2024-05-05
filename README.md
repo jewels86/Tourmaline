@@ -8,7 +8,11 @@ This installation process needs refinement, but this works for now.
 Download the newest release's `linux-x64.zip` and extract it. Then run the command `source init.sh` from inside the directory, then `source ~/.bashrc`. This sets the alias so the app is ready to be used.
 ### Windows
 Download the newest release's `win-x64.zip` and extract it. Then run the command `./init.ps1` from inside the directory. This sets the alias so the app is ready to be used.
-
+## Unistallation
+### Linux
+Still working on it. In the meantime, you can remove the directory and remove the alias from you `~/bash_aliases` file.
+### Windows
+Run the command `./uninstall.ps1`, then remove the directory.
 ## Usage
 ### Commands
 Tourmaline currently has 4 commands:
@@ -51,4 +55,4 @@ The build command is used to generate commands for tourmaline. You enter some in
 - - Make sure docs are accurate
 - Installations
     - Add package to `apt`
-    - Fix windows installation
+- Build new release

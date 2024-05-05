@@ -13,6 +13,7 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
+	  <None Remove="uninstall.ps1" />
 	  <None Remove="Wordlists\CMS\WordPress.txt" />
 	  <None Remove="Wordlists\wordlist.txt" />
 	</ItemGroup>
@@ -24,6 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
+	<Resource Include="uninstall.ps1">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Resource>
 	<Resource Include="Wordlists\CMS\WordPress.txt">
 	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	</Resource>
