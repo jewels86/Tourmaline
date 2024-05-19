@@ -51,7 +51,6 @@ The build command is used to generate commands for tourmaline. You enter some in
 
 ## Todos
 - Finish builder
-- Refactor for style guidelines
 - Add docs
 - - Make sure docs are accurate
 - Installations

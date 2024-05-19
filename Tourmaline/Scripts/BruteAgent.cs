@@ -105,6 +105,7 @@
 				if (!File.Exists(OutfilePath)) { 
 					FileStream stream = File.Create(OutfilePath); 
 					stream.Close();
+					stream.Dispose();
 				}
 				
 				Path[] array = [.. output];
@@ -134,12 +135,5 @@
 			client.Dispose();
 			return output;
 		}
-
-		private int NonNullInArray(object?[] array)
-		{
-			int output = 0;
-			foreach (object? obj in array) if (obj is null) output += 1;
-			return output;
-		} 
 	}
 }

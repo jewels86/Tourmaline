@@ -10,7 +10,7 @@ namespace Tourmaline.Scripts
         {
             Table table = new();
             table.AddColumns("[Blue]Tourmaline[/]", "");
-            table.AddRow("Lincense", "GPL v3")
+            table.AddRow("License", "GPL v3")
                 .AddRow("Creator(s)", "Jewels")
                 .AddRow("Mode", "Builder");
             table.Width(100);
