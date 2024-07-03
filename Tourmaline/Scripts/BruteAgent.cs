@@ -1,144 +1,139 @@
 ﻿namespace Tourmaline.Scripts
 {
-    public class BruteAgent
-    {
-        public string URL { get; set; }
-        public string WordlistPath { get; set; }
-        public string? OutfilePath { get; set; }
-        public bool DevMode { get; set; } = false;
-        public bool BareOutfile { get; set; } = false;
-        public short Threads { get; set; } = 4;
+	public class BruteAgent
+	{
+		public string URL { get; set; }
+		public string WordlistPath { get; set; }
+		public string? OutfilePath { get; set; }
+		public bool DevMode { get; set; } = false;
+		public bool BareOutfile { get; set; } = false;
+		public ushort Threads { get; set; } = 4;
 
-        internal BruteAgent(string wordlistPath, string url)
-        {
-            WordlistPath = wordlistPath;
-            URL = url ;
-        }
+		internal BruteAgent(string wordlistPath, string url)
+		{
+			WordlistPath = wordlistPath;
+			URL = url ;
+		}
 
-        internal async Task<List<Path>> Start(Action<Path>? next = null)
-        {
-            List<Path> output = [];
-            HttpClient client = new();
-            Queue<string> queue;
+		internal async Task<List<Path>> Start(Action<Path>? found = null, Action? next = null)
+		{
+			List<Path> output = [];
+			HttpClient client = new();
+			Queue<string> queue;
+			int length; 
 
-            object outputLock = new();
-            object queueLock = new();
-            object nextLock = new();
+			object outputLock = new();
+			object queueLock = new();
+			object nextLock = new();
 
-            string _tmp = URL;
-            ProcessURL(ref _tmp, true);
-            URL = _tmp;
+			URL = Functions.ProcessURL(URL);
 
-            queue = new(await File.ReadAllLinesAsync(WordlistPath));
+			queue = new(await File.ReadAllLinesAsync(WordlistPath));
+			length = queue.Count;
 
-            async void thread(ThreadCompletionSource tcs)
-            {
-                try
-                {
-                    string address;
-                    lock (queueLock)
-                    {
-                        if (queue.Count == 0) { tcs.Finish(); return; }
-                        address = $"{URL}/{queue.Dequeue()!}";
-                    }
+			ThreadCompletionSource[] tcss = new ThreadCompletionSource[Threads];
 
-                    ProcessURL(ref address);
+			async Task thread(int tn)
+			{
+				try
+				{
+					string address;
+					lock (queueLock)
+					{
+						if (queue.Count == 0) { tcss[tn].Finish(); return; }
+						address = $"{URL}/{queue.Dequeue()!}";
+					}
 
-                    HttpResponseMessage response = await client.GetAsync(address);
-                    if ((int)response.StatusCode > 400) { tcs.Finish(); return; }
+					address = Functions.ProcessURL(address, URL);
 
+					HttpResponseMessage response = await client.GetAsync(address);
+					if ((int)response.StatusCode > 400) 
+					{
+						tcss[tn].Finish();
+						response.Dispose();
+						next?.Invoke();
+						return;
+					}
 
-                    Path path = new()
-                    {
-                        URL = address,
-                        Status = (int)response.StatusCode,
-                        Type = response.Content.Headers.ContentType?.MediaType ?? "unknown"
-                    };
+					Path path = new()
+					{
+						URL = address,
+						Status = (int)response.StatusCode,
+						Type = response.Content.Headers.ContentType?.MediaType ?? "unknown"
+					};
 
-                    lock (outputLock)
-                    {
-                        output.Add(path);
-                    }
+					lock (outputLock)
+					{
+						output.Add(path);
+					}
 
-                    tcs.Finish();
-                    lock (nextLock) next?.Invoke(path);
-                }
-                catch
-                {
-                    if (DevMode == true) throw;
-                    tcs.Finish();
-                    return;
-                }
+					lock (nextLock) found?.Invoke(path);
+					next?.Invoke();
+					response.Dispose();
+					tcss[tn].Finish();
+					return;
+				}
+				catch
+				{
+					if (DevMode == true) throw;
+					next?.Invoke();
+					tcss[tn].Finish();
+					return;
+				}
 
-            }
+			}
 
-            short openThreads = 0;
-            Task[] tasks = new Task[Threads];
-            while (queue.Count - 1 > 0)
-            {
-                while (openThreads >= tasks.Length) await Task.Delay(50);
+			short openThreads = 0;
+			Task[] tasks = new Task[Threads];
+			while (queue.Count > 0)
+			{
+				while (openThreads >= Threads) 
+					await Task.Delay(50);
 
-                ThreadCompletionSource tcs = new();
-                tcs.Finished += () => { openThreads -= 1; };
-                tasks[openThreads] = new(() => thread(tcs));
-                tasks[openThreads].Start();
+				tcss[openThreads] = new();
+				tcss[openThreads].Finished += () => { openThreads -= 1; };
+				tasks[openThreads] = new(async () => await thread(openThreads - 1));
+				tasks[openThreads].Start();
 
-                openThreads++;
-            }
-            foreach (Task task in tasks)
-            {
-                task.Wait();
-            }
+				openThreads++;
+			}
 
-            if (OutfilePath != null)
-            {
-                if (!File.Exists(OutfilePath)) { 
-                    FileStream stream = File.Create(OutfilePath); 
-                    stream.Close();
-                }
-                
-                Path[] array = [.. output];
-                string[] realArray = new string[array.Length];
+			while (openThreads != 0) await Task.Delay(50);
 
-                int i = 0;
-                if (!BareOutfile)
-                {
-                    foreach (var path in array)
-                    {
-                        realArray[i] = path.ToString();
-                        i++;
-                    }
-                } else
-                {
-                    foreach (var path in array)
-                    {
-                        realArray[i] = path.URL;
-                        i++;
-                    }
-                }
-                
+			if (OutfilePath != null)
+			{
+				if (!File.Exists(OutfilePath)) { 
+					FileStream stream = File.Create(OutfilePath); 
+					stream.Close();
+					stream.Dispose();
+				}
+				
+				Path[] array = [.. output];
+				string[] realArray = new string[array.Length];
 
-                File.WriteAllLines(OutfilePath, realArray);
-            }
+				int i = 0;
+				if (!BareOutfile)
+				{
+					foreach (var path in array)
+					{
+						realArray[i] = path.ToString();
+						i++;
+					}
+				} else
+				{
+					foreach (var path in array)
+					{
+						realArray[i] = path.URL;
+						i++;
+					}
+				}
+				
 
-            client.Dispose();
-            return output;
-        }
+				File.WriteAllLines(OutfilePath, realArray);
+			}
 
-        internal void ProcessURL(ref string url, bool isBaseURL = false)
-        {
-            if (url.StartsWith('/') && !isBaseURL)
-            {
-                url = URL + url;
-            }
-
-            url = url.StartsWith("http://") ? url[7..] : url;
-            url = url.StartsWith("https://") ? url[8..] : url;
-            url = url.StartsWith("www.") ? url[4..] : url;
-            url = $"http://{url}";
-            string[] parts = url.Split('#', '?');
-            url = parts[0];
-
-        }
-    }
+			client.Dispose();
+			return output;
+		}
+	}
 }
