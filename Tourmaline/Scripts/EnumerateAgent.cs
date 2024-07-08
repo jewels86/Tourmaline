@@ -43,7 +43,7 @@ namespace Tourmaline.Scripts
 			brute.DevMode = true;
 
 			int length = (await File.ReadAllLinesAsync(WordlistPath)).Length;
-			await brute.Start(paths.Add, () => progress?.Invoke(Math.Round((float)(100 / length), 2)));
+			await brute.Start(paths.Add, null, (inc) => progress?.Invoke(Math.Round((float)(100 / length), 2)));
 
 			// CMS
 			stage?.Invoke(Stages[2]);

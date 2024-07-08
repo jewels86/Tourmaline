@@ -15,7 +15,7 @@
 			URL = url ;
 		}
 
-		internal async Task<List<Path>> Start(Action<Path>? found = null, Action? next = null)
+		internal async Task<List<Path>> Start(Action<Path>? found = null, Action<int>? setMax = null, Action<double>? next = null)
 		{
 			List<Path> output = [];
 			HttpClient client = new();
@@ -52,7 +52,7 @@
 					{
 						//tcss[tn].Finish();
 						response.Dispose();
-						next?.Invoke();
+						next?.Invoke(1);
 						return;
 					}
 
@@ -69,7 +69,7 @@
 					}
 
 					lock (nextLock) found?.Invoke(path);
-					next?.Invoke();
+					next?.Invoke(1);
 					response.Dispose();
 					//tcss[tn].Finish();
 					return;
@@ -77,7 +77,7 @@
 				catch
 				{
 					if (DevMode == true) throw;
-					next?.Invoke();
+					next?.Invoke(1);
 					//response?.Dispose();
 					//tcss[tn].Finish();
 					return;

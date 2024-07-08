@@ -41,6 +41,38 @@ namespace Tourmaline.Scripts
 			public bool OutputBare { get; init; }
 		}
 
+		internal class GUI
+		{
+			internal Table Table = new();
+			internal Action<string, string, string> AddRow = (a, b, c) => { };
+			internal Action<int> SetProgressCap = (a) => { };
+			internal Action<double> IncrementProgress = (a) => { };
+			internal TaskCompletionSource TaskCompletionSource = new();
+
+			internal void Start()
+			{
+				Table.AddColumns("URL", "Type", "Status")
+					.Alignment(Justify.Left)
+					.Width = 300;
+
+				AnsiConsole.Live(Table).StartAsync(async (ctx) =>
+				{
+					AddRow = (a, b, c) => { Table.AddRow($"[blue]{a}[/]", b, c); ctx.UpdateTarget(Table); };
+					await TaskCompletionSource.Task;
+				});
+
+				Progress progress = AnsiConsole.Progress();
+				progress.Columns(new ProgressBarColumn(), new PercentageColumn());
+				progress.StartAsync(async (ctx) =>
+				{
+					ProgressTask task = ctx.AddTask("Enumerating...");
+					SetProgressCap = (a) => task.MaxValue = a;
+					IncrementProgress = (a) => task.Increment(a);
+					await TaskCompletionSource.Task;
+				});
+			}
+		}
+
 		public async override Task<int> ExecuteAsync(CommandContext context, Settings settings)
 		{
 			bool wasNull = settings.WordlistPath == null;
@@ -61,7 +93,7 @@ namespace Tourmaline.Scripts
 			if (!settings.OutputBare) AnsiConsole.Write(table);
 
 			BruteAgent agent = new(settings.WordlistPath, settings.URL);
-			GUI gui = new();
+			BruteCommand.GUI gui = new();
 
 			agent.DevMode = settings.DevMode;
 			agent.BareOutfile = settings.OutfileBare;
@@ -83,7 +115,7 @@ namespace Tourmaline.Scripts
 				if (start == "No") return -1;
 
 				gui.Start();
-				await agent.Start((path) => gui.AddRow(path.URL, path.Type, path.Status.ToString()));
+				await agent.Start((path) => gui.AddRow(path.URL, path.Type, path.Status.ToString()), (max) => gui.SetProgressCap(max), (inc) => gui.IncrementProgress(inc));
 			}
 			
 			gui.TaskCompletionSource.TrySetResult();
