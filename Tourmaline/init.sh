@@ -1,3 +1,3 @@
 echo Initializing...
-echo -e alias tourmaline=$PWD/Tourmaline >> ~/.bash_aliases
+echo -e "\nexport PATH=$PATH:$(echo $PWD)\n" >> ~/.bashrc
 echo Finished.

@@ -31,25 +31,26 @@
 			queue = new(await File.ReadAllLinesAsync(WordlistPath));
 			length = queue.Count;
 
-			ThreadCompletionSource[] tcss = new ThreadCompletionSource[Threads];
+			//ThreadCompletionSource[] tcss = new ThreadCompletionSource[Threads];
 
 			async Task thread(int tn)
 			{
+				HttpResponseMessage response;
 				try
 				{
 					string address;
 					lock (queueLock)
 					{
-						if (queue.Count == 0) { tcss[tn].Finish(); return; }
+						if (queue.Count == 0) { /*tcss[tn].Finish();*/ return; }
 						address = $"{URL}/{queue.Dequeue()!}";
 					}
 
 					address = Functions.ProcessURL(address, URL);
 
-					HttpResponseMessage response = await client.GetAsync(address);
+					response = await client.GetAsync(address);
 					if ((int)response.StatusCode > 400) 
 					{
-						tcss[tn].Finish();
+						//tcss[tn].Finish();
 						response.Dispose();
 						next?.Invoke();
 						return;
@@ -70,14 +71,15 @@
 					lock (nextLock) found?.Invoke(path);
 					next?.Invoke();
 					response.Dispose();
-					tcss[tn].Finish();
+					//tcss[tn].Finish();
 					return;
 				}
 				catch
 				{
 					if (DevMode == true) throw;
 					next?.Invoke();
-					tcss[tn].Finish();
+					//response?.Dispose();
+					//tcss[tn].Finish();
 					return;
 				}
 
@@ -90,10 +92,11 @@
 				while (openThreads >= Threads) 
 					await Task.Delay(50);
 
-				tcss[openThreads] = new();
-				tcss[openThreads].Finished += () => { openThreads -= 1; };
-				tasks[openThreads] = new(async () => await thread(openThreads - 1));
+				/*tcss[openThreads] = new();
+				tcss[openThreads].Finished += () => { openThreads -= 1; };*/
+				tasks[openThreads] = new(async () => await thread(openThreads));
 				tasks[openThreads].Start();
+				_ = tasks[openThreads].ContinueWith((t) => { openThreads -= 1; tasks[openThreads].Dispose(); });
 
 				openThreads++;
 			}

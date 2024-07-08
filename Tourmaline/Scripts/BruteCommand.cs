@@ -1,6 +1,7 @@
 ﻿using Spectre.Console.Cli;
 using Spectre.Console;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace Tourmaline.Scripts
 {
@@ -13,8 +14,8 @@ namespace Tourmaline.Scripts
 			public required string URL { get; init; }
 
 			[Description("The path to the wordlist.")]
-			[CommandArgument(1, "<wordlistPath>")]
-			public required string WordlistPath { get; init; }
+			[CommandArgument(1, "[wordlistPath]")]
+			public required string? WordlistPath { get; set; }
 
 			[Description("Initiates dev mode.")]
 			[CommandOption("-d")]
@@ -42,6 +43,10 @@ namespace Tourmaline.Scripts
 
 		public async override Task<int> ExecuteAsync(CommandContext context, Settings settings)
 		{
+			bool wasNull = settings.WordlistPath == null;
+			if (settings.WordlistPath == null) settings.WordlistPath = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly()?.Location ?? "") + "/Wordlists/wordlist.txt";
+			if (settings.WordlistPath == "/Wordlists/wordlist.txt" && wasNull) { AnsiConsole.WriteLine("No wordlist given."); return -1; }
+
 			Table table = new();
 			table.AddColumns("[Blue]Tourmaline[/]", "");
 			table.AddRow("License", "GPL v3")
