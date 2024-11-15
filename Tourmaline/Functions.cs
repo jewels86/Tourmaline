@@ -8,16 +8,32 @@ namespace Tourmaline
 {
 	internal static class Functions
 	{
-		internal static string ResolveURL(string url)
+		internal static string ResolveURL(string baseUrl, params string[] parts)
 		{
-			if (url.StartsWith("http://") || url.StartsWith("https://"))
+			StringBuilder sb;
+			if (!(baseUrl.StartsWith("http://") || baseUrl.StartsWith("https://")))
 			{
-				return url;
+				baseUrl = "http://" + baseUrl;
 			}
-			else
+			sb = new StringBuilder(baseUrl);
+
+			foreach (string part in parts) 
 			{
-				return "http://" + url;
+				if (part.StartsWith("/"))
+				{
+					sb.Append(part);
+				}
+				else
+				{
+					sb.Append("/" + part);
+				}
 			}
+
+			return sb.ToString();
+		}
+		internal static string[] ReadFileAsLines(string path)
+		{
+			return System.IO.File.ReadAllLines(path);
 		}
 	}
 }

@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Spectre.Console;
 using Spectre.Console.Cli;
+using Tourmaline;
 
 namespace Tourmaline.Commands
 {
-	internal class SpiderCommand : Command<SpiderCommand.Settings>
+	internal class SpiderCommand : AsyncCommand<SpiderCommand.Settings>
 	{
 		public class Settings : CommandSettings
 		{
@@ -38,11 +39,28 @@ namespace Tourmaline.Commands
 
 			[CommandOption("-i| --ignore-regex <IGNORE-REGEX>")]
 			public string IgnoreRegex { get; set; } = string.Empty;
+
+			[CommandOption("-k| --known <KNOWN>")]
+			public string _Known { get; set; } = string.Empty;
+
+			[CommandOption("--known-file <KNOWN-FILE>")]
+			public string KnownFile { get; set; } = string.Empty;
+
+			public string[] Known { get; set; } = [];
 		}
 
-		public override int Execute(CommandContext context, Settings settings)
+		public async override Task<int> ExecuteAsync(CommandContext context, Settings settings)
 		{
 			settings.URL = Functions.ResolveURL(settings.URL);
+			
+			if (settings.KnownFile != string.Empty)
+			{
+				settings.Known = Functions.ReadFileAsLines(settings.KnownFile);
+			}
+			else if (settings._Known != string.Empty)
+			{
+				settings.Known = settings._Known.Split(',');
+			}
 
 			Table table = new();
 			table.AddColumns("[green]Tourmaline[/]", "v2.0");
@@ -58,6 +76,7 @@ namespace Tourmaline.Commands
 			table.AddRow("Depth", settings.Depth != -1 ? settings.Depth.ToString() : "No depth specified.");
 			table.AddRow("Regex", settings.Regex == string.Empty ? "No regex specified." : settings.Regex);
 			table.AddRow("Ignore Regex", settings.IgnoreRegex == string.Empty ? "No ignore regex specified." : settings.IgnoreRegex);
+			table.AddRow("Known Paths", settings.Known.Length == 0 ? "No known paths specified." : string.Join(", ", settings.Known));
 			table.AddEmptyRow();
 
 			table.AddRow("License", "GPL-3.0");
@@ -69,7 +88,7 @@ namespace Tourmaline.Commands
 			status.Spinner = Spinner.Known.Dots;
 			try
 			{
-				status.Start("Setting up...", async action =>
+				await status.Start("Setting up...", async action =>
 				{
 					if (settings.Debug) Console.WriteLine("Preparing...");
 					await Task.Delay(5000);
@@ -85,6 +104,7 @@ namespace Tourmaline.Commands
 				if (settings.Debug) Console.WriteLine("Error");
 				return -1; 
 			}
+
 			if (settings.Debug) Console.WriteLine("Preparation complete.");
 
 			return 0;
@@ -99,13 +119,26 @@ namespace Tourmaline.Commands
 			{
 				HttpResponseMessage res = await client.GetAsync(s.URL);
 
-				if (!res.IsSuccessStatusCode)
+				if (res.IsSuccessStatusCode == false)
 				{
 					AnsiConsole.MarkupLine($"[bold]{s.URL}[/] didn't return a successful status code.\n[green]Tip[/]: run tourmaline with the [bold]-f[/] flag to run anyway.");
-					throw new Exception("Site not accessible.");
+					return false;
 				}
 			}
-			catch { return false; }
+			catch 
+			{ 
+				AnsiConsole.MarkupLine($"[bold]{s.URL}[/] is not accessible.");
+				return false; 
+			}
+
+			foreach (string known in s.Known)
+			{
+				string k = Functions.ResolveURL(s.URL, known);
+				HttpResponseMessage res = await client.GetAsync(k);
+
+			}
+
+			client.Dispose();
 
 			return true;
 		}
