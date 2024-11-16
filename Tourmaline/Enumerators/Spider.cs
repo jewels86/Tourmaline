@@ -74,7 +74,7 @@ namespace Tourmaline.Enumerators
 							if (res.IsSuccessStatusCode == false)
 								continue;
 							string u = ProcessURL(match.Groups[1].Value);
-							if (found.Contains(u) || queue.Contains(u) || !u.Contains(Functions.TruncateURL(URL))) continue;
+							if (found.Contains(u) || queue.Contains(u) || !u.Contains(Functions.TruncateURL(URL)) || u.Contains(' ')) continue;
 							if (Regex.IsMatch(u) && !IgnoreRegex.IsMatch(u) && CheckDepth(u))
 							{
 								queue.Enqueue(u);
@@ -107,7 +107,13 @@ namespace Tourmaline.Enumerators
 
 		public string ProcessURL(string url)
 		{
-			if (url.StartsWith("/") || !(url.StartsWith("https://") || url.StartsWith("http://"))) return Functions.ResolveURL(URL, url);
+			if (url.StartsWith("/") || !(url.StartsWith("https://") || url.StartsWith("http://")))
+				url = Functions.ResolveURL(URL, url);
+
+			int index = url.IndexOfAny(['#', '?']);
+			if (index != -1)
+				url = url.Substring(0, index);
+
 			return url;
 		}
 

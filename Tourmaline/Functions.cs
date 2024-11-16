@@ -48,6 +48,14 @@ namespace Tourmaline
 			}
 			return url;
 		}
+		internal static string RemoveTrailingSlash(string url)
+		{
+			if (url.EndsWith("/"))
+			{
+				url = url.Substring(0, url.Length - 1);
+			}
+			return url;
+		}
 		internal static string[] ReadFileAsLines(string path)
 		{
 			return System.IO.File.ReadAllLines(path);
