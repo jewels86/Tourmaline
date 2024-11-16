@@ -6,16 +6,18 @@ using System.Threading.Tasks;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using Tourmaline;
-using Tourmaline.Enumerators;
 
 namespace Tourmaline.Commands
 {
-	internal class SpiderCommand : AsyncCommand<SpiderCommand.Settings>
+	internal class BruteCommand : AsyncCommand<BruteCommand.Settings>
 	{
 		public class Settings : CommandSettings
 		{
 			[CommandArgument(0, "<URL>")]
 			public required string URL { get; set; }
+
+			[CommandArgument(1, "[WORDLIST]")]
+			public string Wordlist { get; set; } = string.Empty;
 
 			[CommandOption("-t|--threads <THREADS>")]
 			public int Threads { get; set; } = 4;
@@ -29,38 +31,35 @@ namespace Tourmaline.Commands
 			[CommandOption("--debug")]
 			public bool Debug { get; set; } = false;
 
-			[CommandOption("-f|--force")]
-			public bool Force { get; set; } = false;
-
 			[CommandOption("-d|--depth <DEPTH>")]
-			public int Depth { get; set; } = -1;
-
-			[CommandOption("-r| --regex <REGEX>")]
-			public string Regex { get; set; } = @".*";
-
-			[CommandOption("-i| --ignore-regex <IGNORE-REGEX>")]
-			public string IgnoreRegex { get; set; } = "(?!)";
-
-			[CommandOption("-k| --known <KNOWN>")]
-			public string _Known { get; set; } = string.Empty;
-
-			[CommandOption("--known-file <KNOWN-FILE>")]
-			public string KnownFile { get; set; } = string.Empty;
-
-			public string[] Known { get; set; } = [];
+			public int Depth { get; set; } = 1;
 		}
 
 		public async override Task<int> ExecuteAsync(CommandContext context, Settings settings)
 		{
 			settings.URL = Functions.ResolveURL(settings.URL);
-			
-			if (settings.KnownFile != string.Empty)
+			settings.Wordlist = settings.Wordlist == string.Empty ? "https://raw.githubusercontent.com/3ndG4me/KaliLists/refs/heads/master/dirb/common.txt" : settings.Wordlist;
+
+			string[] paths;
+
+			if (settings.Wordlist.StartsWith("http://") || settings.Wordlist.StartsWith("https://"))
 			{
-				settings.Known = Functions.ReadFileAsLines(settings.KnownFile);
+				HttpClient client = new();
+				HttpResponseMessage res = await client.GetAsync(settings.Wordlist);
+
+				if (res.IsSuccessStatusCode == false)
+				{
+					client.Dispose();
+					AnsiConsole.MarkupLine($"Wordlist [bold]{settings.Wordlist}[/] didn't return a successful status code.");
+					return -1;
+				}
+				string content = await res.Content.ReadAsStringAsync();
+				paths = content.Split("\n");
+				client.Dispose();
 			}
-			else if (settings._Known != string.Empty)
+			else
 			{
-				settings.Known = settings._Known.Split(',');
+				paths = Functions.ReadFileAsLines(settings.Wordlist);
 			}
 
 			Table table = new();
@@ -68,17 +67,14 @@ namespace Tourmaline.Commands
 			table.Width = 200;
 
 			table.AddRow("URL", settings.URL);
-			table.AddRow("Mode", "Spider");
+			table.AddRow("Mode", "Brute Force");
 			table.AddRow("Threads", settings.Threads.ToString());
 			table.AddRow("Outfile", settings.OutFile == string.Empty ? "No outfile specified." : settings.OutFile);
 			table.AddRow("Debug Mode", settings.Debug.ToString());
-			table.AddRow("Force", settings.Force.ToString());
 			table.AddEmptyRow();
 
+			table.AddRow("Wordlist", settings.Wordlist);
 			table.AddRow("Depth", settings.Depth != -1 ? settings.Depth.ToString() : "No depth specified.");
-			table.AddRow("Regex", settings.Regex == string.Empty ? "No regex specified." : settings.Regex);
-			table.AddRow("Ignore Regex", settings.IgnoreRegex == string.Empty ? "No ignore regex specified." : settings.IgnoreRegex);
-			table.AddRow("Known Paths", settings.Known.Length == 0 ? "No known paths specified." : string.Join(", ", settings.Known));
 			table.AddEmptyRow();
 
 			table.AddRow("License", "GPL-3.0");
@@ -101,16 +97,13 @@ namespace Tourmaline.Commands
 					}
 				});
 			}
-			catch 
+			catch
 			{
 				AnsiConsole.MarkupLine("[green]Tourmaline[/] is exiting (Error in preparation).");
-				return -1; 
+				return -1;
 			}
 
 			if (settings.Debug) Console.WriteLine("Preparation complete.");
-
-			Spider spider = new(settings);
-			await spider.Enumerate();
 
 			return 0;
 		}
@@ -130,31 +123,10 @@ namespace Tourmaline.Commands
 					return false;
 				}
 			}
-			catch 
-			{ 
-				AnsiConsole.MarkupLine($"[bold]{s.URL}[/] is not accessible.");
-				return false; 
-			}
-
-			foreach (string known in s.Known)
+			catch
 			{
-				string k = Functions.ResolveURL(s.URL, known);
-
-				try
-				{
-					HttpResponseMessage res = await client.GetAsync(k);
-
-					if (res.IsSuccessStatusCode == false)
-					{
-						AnsiConsole.MarkupLine($"[bold]{k}[/] didn't return a successful status code.\n[green]Tip[/]: run tourmaline with the [bold]-f[/] flag to run anyway.");
-						return false;
-					}
-				}
-				catch
-				{
-					AnsiConsole.MarkupLine($"[bold]{k}[/] is not accessible.");
-					return false;
-				}
+				AnsiConsole.MarkupLine($"[bold]{s.URL}[/] is not accessible.");
+				return false;
 			}
 
 			client.Dispose();

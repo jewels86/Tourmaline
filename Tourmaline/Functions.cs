@@ -31,6 +31,23 @@ namespace Tourmaline
 
 			return sb.ToString();
 		}
+		internal static string TruncateURL(string url)
+		{
+			if (url.StartsWith("http://"))
+			{
+				url = url.Substring(7);
+			}
+			else if (url.StartsWith("https://"))
+			{
+				url = url.Substring(8);
+			}
+			int slashIndex = url.IndexOf('/');
+			if (slashIndex != -1)
+			{
+				url = url.Substring(0, slashIndex);
+			}
+			return url;
+		}
 		internal static string[] ReadFileAsLines(string path)
 		{
 			return System.IO.File.ReadAllLines(path);
