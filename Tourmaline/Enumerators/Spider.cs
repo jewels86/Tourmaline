@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -18,9 +19,11 @@ namespace Tourmaline.Enumerators
 		public Regex Regex { get; set; }
 		public Regex IgnoreRegex { get; set; }
 		public bool Debug { get; set; }
+		public string[] Known { get; set; }
 
 		public Regex JSPathFinder = new(@"['""]([a-zA-Z0-9\\\/\.?!#,=:;&% ]+[\\\/\.][a-zA-Z0-9\\\/\.?!#,=:;&% ]+)['""]");
 		public Regex HTMLPathFinder = new(@"(src|href|action)=""([a-zA-Z0-9\\\/\.?!#,=:;&% ]+)""");
+		public Regex OtherPathFinder = new(@"(?:\/[a-zA-Z0-9\-_]+|[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+)");
 
 		public Spider(SpiderCommand.Settings settings)
 		{
@@ -31,19 +34,18 @@ namespace Tourmaline.Enumerators
 			Regex = new(settings.Regex);
 			IgnoreRegex = new(settings.IgnoreRegex);
 			Debug = settings.Debug;
+			Known = Functions.ResolveURLs(URL, settings.Known);
 		}
 
 		public async Task Enumerate()
 		{
-			Queue<string> queue = new();
+			Queue<string> queue = new(Known.Append(URL));
 			List<string> found = new();
 			Task[] tasks = new Task[Threads];
 			HttpClient client = new();
 			bool stop = false;
 
 			object queueLock = new();
-
-			queue.Enqueue(URL);
 
 			Func<Task> thread = async () =>
 			{

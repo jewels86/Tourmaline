@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Spectre.Console;
 using Spectre.Console.Cli;
-using Tourmaline;
+using static Tourmaline.Functions;
 using Tourmaline.Enumerators;
 
 namespace Tourmaline.Commands
@@ -52,15 +52,19 @@ namespace Tourmaline.Commands
 
 		public async override Task<int> ExecuteAsync(CommandContext context, Settings settings)
 		{
-			settings.URL = Functions.ResolveURL(settings.URL);
+			settings.URL = ResolveURL(settings.URL);
 			
 			if (settings.KnownFile != string.Empty)
 			{
-				settings.Known = Functions.ReadFileAsLines(settings.KnownFile);
+				settings.Known = ReadFileAsLines(settings.KnownFile);
 			}
 			else if (settings._Known != string.Empty)
 			{
 				settings.Known = settings._Known.Split(',');
+			}
+			else if (settings.Known.Length == 0)
+			{
+				settings.Known = ["sitemap.xml", "robots.txt"];
 			}
 
 			Table table = new();
@@ -134,27 +138,6 @@ namespace Tourmaline.Commands
 			{ 
 				AnsiConsole.MarkupLine($"[bold]{s.URL}[/] is not accessible.");
 				return false; 
-			}
-
-			foreach (string known in s.Known)
-			{
-				string k = Functions.ResolveURL(s.URL, known);
-
-				try
-				{
-					HttpResponseMessage res = await client.GetAsync(k);
-
-					if (res.IsSuccessStatusCode == false)
-					{
-						AnsiConsole.MarkupLine($"[bold]{k}[/] didn't return a successful status code.\n[green]Tip[/]: run tourmaline with the [bold]-f[/] flag to run anyway.");
-						return false;
-					}
-				}
-				catch
-				{
-					AnsiConsole.MarkupLine($"[bold]{k}[/] is not accessible.");
-					return false;
-				}
 			}
 
 			client.Dispose();

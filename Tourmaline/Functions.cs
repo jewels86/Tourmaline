@@ -31,6 +31,18 @@ namespace Tourmaline
 
 			return sb.ToString();
 		}
+		internal static string[] ResolveURLs(string baseUrl, string[] strings)
+		{
+			List<string> list = new();
+
+			foreach (string str in strings)
+			{
+				list.Add(ResolveURL(baseUrl, str));
+			}
+
+			return list.ToArray();
+		}
+
 		internal static string TruncateURL(string url)
 		{
 			if (url.StartsWith("http://"))
@@ -59,6 +71,13 @@ namespace Tourmaline
 		internal static string[] ReadFileAsLines(string path)
 		{
 			return System.IO.File.ReadAllLines(path);
+		}
+
+		internal static string[] RemoveFromArray(string[] array, string item)
+		{
+			List<string> list = new(array);
+			list.Remove(item);
+			return list.ToArray();
 		}
 	}
 }

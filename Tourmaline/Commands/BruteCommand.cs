@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Spectre.Console;
 using Spectre.Console.Cli;
-using Tourmaline;
+using Tourmaline.Enumerators;
 
 namespace Tourmaline.Commands
 {
@@ -30,9 +30,6 @@ namespace Tourmaline.Commands
 
 			[CommandOption("--debug")]
 			public bool Debug { get; set; } = false;
-
-			[CommandOption("-d|--depth <DEPTH>")]
-			public int Depth { get; set; } = 1;
 		}
 
 		public async override Task<int> ExecuteAsync(CommandContext context, Settings settings)
@@ -74,7 +71,6 @@ namespace Tourmaline.Commands
 			table.AddEmptyRow();
 
 			table.AddRow("Wordlist", settings.Wordlist);
-			table.AddRow("Depth", settings.Depth != -1 ? settings.Depth.ToString() : "No depth specified.");
 			table.AddEmptyRow();
 
 			table.AddRow("License", "GPL-3.0");
@@ -104,6 +100,9 @@ namespace Tourmaline.Commands
 			}
 
 			if (settings.Debug) Console.WriteLine("Preparation complete.");
+
+			Brute brute = new(settings, paths);
+			await brute.Enumerate();
 
 			return 0;
 		}
