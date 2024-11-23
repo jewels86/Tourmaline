@@ -27,9 +27,6 @@ namespace Tourmaline.Commands
 
 			[CommandOption("--debug")]
 			public bool Debug { get; set; } = false;
-
-			[CommandOption("-f|--force")]
-			public bool Force { get; set; } = false;
 		}
 
 		public async override Task<int> ExecuteAsync(CommandContext context, Settings settings)
@@ -45,7 +42,6 @@ namespace Tourmaline.Commands
 			table.AddRow("Threads", settings.Threads.ToString());
 			table.AddRow("Outfile", settings.OutFile == string.Empty ? "No outfile specified." : settings.OutFile);
 			table.AddRow("Debug Mode", settings.Debug.ToString());
-			table.AddRow("Force", settings.Force.ToString());
 			table.AddEmptyRow();
 
 			table.AddRow("License", "GPL-3.0");
@@ -90,7 +86,7 @@ namespace Tourmaline.Commands
 
 				if (res.IsSuccessStatusCode == false)
 				{
-					AnsiConsole.MarkupLine($"[bold]{s.URL}[/] didn't return a successful status code.\n[green]Tip[/]: run tourmaline with the [bold]-f[/] flag to run anyway.");
+					AnsiConsole.MarkupLine($"[bold]{s.URL}[/] didn't return a successful status code.");
 					return false;
 				}
 			}
