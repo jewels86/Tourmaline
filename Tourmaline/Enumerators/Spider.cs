@@ -61,8 +61,10 @@ namespace Tourmaline.Enumerators
 					{
 						string url;
 						lock (queueLock) url = queue.Dequeue();
+						HttpResponseMessage res;
 
-						HttpResponseMessage res = await client.GetAsync(url);
+						try { res = await client.GetAsync(url); }
+						catch { continue; }
 
 						if (!res.IsSuccessStatusCode) continue;
 
@@ -70,8 +72,9 @@ namespace Tourmaline.Enumerators
 
 						MatchCollection htmlMatches = HTMLPathFinder.Matches(content);
 						MatchCollection jsMatches = JSPathFinder.Matches(content);
+						MatchCollection otherMatches = OtherPathFinder.Matches(content);
 
-						foreach (Match match in htmlMatches.Concat(jsMatches))
+						foreach (Match match in otherMatches.Concat(htmlMatches.Concat(jsMatches)))
 						{
 							if (res.IsSuccessStatusCode == false)
 								continue;
