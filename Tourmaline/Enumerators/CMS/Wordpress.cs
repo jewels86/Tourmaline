@@ -6,27 +6,53 @@ namespace Tourmaline;
 
 internal static partial class CMSFuncs
 {
-    internal static async Task<float> Wordpress(string url) 
+    internal static async Task<float> Wordpress(string url, HttpClient client) 
     {
         float score = 0;
 
-        HttpClient client = new();
-        HttpResponseMessage fileRes = await client.GetAsync("https://gold-team.tech/static/tourmaline/wordpress.txt");
-		string file = await fileRes.Content.ReadAsStringAsync();
-        Dictionary<string, int> files = Functions.ParseCMSFile(file);
+        score += await Functions.ScorePaths(url, "wordpress", client);
 
-        foreach (var kvp in files)
-        {
-            string p = kvp.Key;
-            int s = kvp.Value;
+		// html analysis
+        string html = await client.GetStringAsync(url);
+		int htmlScore = 0;
+        List<string> tags = ["<meta name=\"generator\" content=\"WordPress", "<!-- This website is powered by WordPress -->"];
 
-			HttpResponseMessage res = await client.GetAsync(Functions.ResolveURL(url, p));
-            if (res.IsSuccessStatusCode)
+		foreach (string tag in tags)
+		{
+			if (html.Contains(tag))
 			{
-				score += s;
+				htmlScore += 1;
 			}
 		}
 
-        return score;
+		score += htmlScore / tags.Count;
+
+		// header analysis
+		int headerScore = 0;
+		List<string> headers = ["X-Powered-By: WordPress"];
+
+		foreach (string header in headers)
+		{
+			if (client.DefaultRequestHeaders.Contains(header))
+			{
+				headerScore += 1;
+			}
+		}
+
+		score += headerScore / headers.Count;
+
+		// pattern analysis
+		int patternScore = 0;
+
+		string notfoundpage = await client.GetStringAsync(Functions.ResolveURL(url, "probablynotfound"));
+		if (notfoundpage.Contains("<title>Page not found - WordPress</title>"))
+		{
+			patternScore += 1;
+		}
+
+		score += patternScore / 1;
+		score = (score / 4) * 100;
+
+		return score;
 	}
 }

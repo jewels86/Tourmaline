@@ -1,0 +1,13 @@
+administrator: 2
+components: 3
+modules: 4
+plugins: 3
+templates: 3
+media: 1
+images: 1
+cache: 2
+logs: 2
+robots.txt: 1
+htaccess.txt: 3
+web.config.txt: 3
+libraries: 2

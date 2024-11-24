@@ -16,7 +16,7 @@ namespace Tourmaline.Enumerators
 
 		public Dictionary<string, Func<string, float>> CMSs = new();
 
-		public CMS(CMSCommand.Settings settings, string[] wordlist)
+		public CMS(CMSCommand.Settings settings)
 		{
 			URL = Functions.RemoveTrailingSlash(settings.URL);
 			Threads = settings.Threads;
@@ -29,9 +29,9 @@ namespace Tourmaline.Enumerators
 			List<string> found = new();
 			Task[] tasks = new Task[Threads];
 			HttpClient client = new();
-			ConcurrentQueue<KeyValuePair<string, string>> queue = new();
 
-
+			if (Debug) Console.WriteLine("Starting CMS detection...");
+			AnsiConsole.MarkupLine((await CMSFuncs.Wordpress(URL, client)).ToString());
 		}
 	}
 }

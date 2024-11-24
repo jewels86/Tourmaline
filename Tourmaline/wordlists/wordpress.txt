@@ -1,0 +1,11 @@
+wp-admin: 10
+wp-login: 10
+wp-login.php: 10
+wp-includes: 10
+wp-content: 10
+wp-json: 10
+
+xmlrpc.php: 7
+readme.html: 3
+license.txt: 3
+sitemap.xml: 1

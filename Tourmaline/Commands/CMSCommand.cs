@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Spectre.Console;
 using Spectre.Console.Cli;
-using Tourmaline;
+using Tourmaline.Enumerators;
 
 namespace Tourmaline.Commands
 {
@@ -71,6 +71,9 @@ namespace Tourmaline.Commands
 			}
 
 			if (settings.Debug) Console.WriteLine("Preparation complete.");
+
+			CMS cms = new(settings);
+			await cms.Enumerate();
 
 			return 0;
 		}

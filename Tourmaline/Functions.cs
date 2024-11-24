@@ -84,9 +84,8 @@ namespace Tourmaline
 			return str.Replace("[", "[[").Replace("]", "]]");
 		}
 
-		internal static Dictionary<string, int> ParseCMSFile(string str)
+		internal static Dictionary<string, int> ParseCMSFile(string[] lines)
 		{
-			string[] lines = str.Split('\n');
 			Dictionary<string, int> output = new();
 
 			foreach (string line in lines)
@@ -96,6 +95,28 @@ namespace Tourmaline
 			}
 
 			return output;
+		}
+
+		internal async static Task<float> ScorePaths(string url, string name, HttpClient client)
+		{
+			string[] file = await File.ReadAllLinesAsync(Path.Combine(AppContext.BaseDirectory, "wordlists", $"{name}.txt"));
+			Dictionary<string, int> files = ParseCMSFile(file);
+
+			int pathsScore = 0;
+
+			foreach (var kvp in files)
+			{
+				string p = kvp.Key;
+				int s = kvp.Value;
+
+				HttpResponseMessage res = await client.GetAsync(Functions.ResolveURL(url, p));
+				if (res.IsSuccessStatusCode)
+				{
+					pathsScore += s;
+				}
+			}
+
+			return 100 * (pathsScore / files.Count);
 		}
 	}
 }
