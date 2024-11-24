@@ -17,7 +17,7 @@ namespace Tourmaline
 			}
 			sb = new StringBuilder(baseUrl);
 
-			foreach (string part in parts) 
+			foreach (string part in parts)
 			{
 				if (part.StartsWith("/"))
 				{
@@ -78,6 +78,24 @@ namespace Tourmaline
 			List<string> list = new(array);
 			list.Remove(item);
 			return list.ToArray();
+		}
+		internal static string Escape(string str)
+		{
+			return str.Replace("[", "[[").Replace("]", "]]");
+		}
+
+		internal static Dictionary<string, int> ParseCMSFile(string str)
+		{
+			string[] lines = str.Split('\n');
+			Dictionary<string, int> output = new();
+
+			foreach (string line in lines)
+			{
+				string[] parts = line.Split(": ");
+				output.Add(parts[0], int.Parse(parts[1]));
+			}
+
+			return output;
 		}
 	}
 }

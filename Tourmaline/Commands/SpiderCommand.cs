@@ -41,6 +41,12 @@ namespace Tourmaline.Commands
 			[CommandOption("-i| --ignore-regex <IGNORE-REGEX>")]
 			public string IgnoreRegex { get; set; } = "(?!)";
 
+			[CommandOption("--forceregex")]
+			public bool ForceRegex { get; set; } = false;
+
+			[CommandOption("--forceignore")]
+			public bool ForceIgnore { get; set; } = false;
+
 			[CommandOption("-k| --known <KNOWN>")]
 			public string _Known { get; set; } = string.Empty;
 
@@ -80,8 +86,8 @@ namespace Tourmaline.Commands
 			table.AddEmptyRow();
 
 			table.AddRow("Depth", settings.Depth != -1 ? settings.Depth.ToString() : "No depth specified.");
-			table.AddRow("Regex", settings.Regex == string.Empty ? "No regex specified." : settings.Regex);
-			table.AddRow("Ignore Regex", settings.IgnoreRegex == string.Empty ? "No ignore regex specified." : settings.IgnoreRegex);
+			table.AddRow("Regex", settings.Regex == string.Empty ? "No regex specified." :  Escape(settings.Regex)); // add escape method in functions
+			table.AddRow("Ignore Regex", settings.IgnoreRegex == string.Empty ? "No ignore regex specified." : Escape(settings.IgnoreRegex));
 			table.AddRow("Known Paths", settings.Known.Length == 0 ? "No known paths specified." : string.Join(", ", settings.Known));
 			table.AddEmptyRow();
 

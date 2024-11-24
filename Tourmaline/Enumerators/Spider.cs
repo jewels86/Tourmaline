@@ -20,6 +20,8 @@ namespace Tourmaline.Enumerators
 		public Regex IgnoreRegex { get; set; }
 		public bool Debug { get; set; }
 		public string[] Known { get; set; }
+		public bool ForceRegex { get; set; }
+		public bool ForceIgnore { get; set; }
 
 		public Regex JSPathFinder = new(@"['""]([a-zA-Z0-9\\\/\.?!#,=:;&% ]+[\\\/\.][a-zA-Z0-9\\\/\.?!#,=:;&% ]+)['""]");
 		public Regex HTMLPathFinder = new(@"(src|href|action)=""([a-zA-Z0-9\\\/\.?!#,=:;&% ]+)""");
@@ -35,6 +37,8 @@ namespace Tourmaline.Enumerators
 			IgnoreRegex = new(settings.IgnoreRegex);
 			Debug = settings.Debug;
 			Known = Functions.ResolveURLs(URL, settings.Known);
+			ForceRegex = settings.ForceRegex;
+			ForceIgnore = settings.ForceIgnore;
 		}
 
 		public async Task Enumerate()
@@ -79,15 +83,25 @@ namespace Tourmaline.Enumerators
 							if (res.IsSuccessStatusCode == false)
 								continue;
 							string u = ProcessURL(match.Groups[1].Value);
+
+							if (ForceRegex && !Regex.IsMatch(u))
+								continue;
+							if (ForceIgnore && IgnoreRegex.IsMatch(u))
+								continue;
+
 							if (found.Contains(u) || queue.Contains(u) || !u.Contains(Functions.TruncateURL(URL)) || u.Contains(' ')) continue;
-							if (Regex.IsMatch(u) && !IgnoreRegex.IsMatch(u) && CheckDepth(u))
+							if (CheckDepth(u))
 							{
 								queue.Enqueue(u);
 							}
 						}
 
-						AnsiConsole.MarkupLine($"[bold green]{url}[/] - {(int)res.StatusCode} {res.StatusCode.ToString()} ([bold]{queue.Count}[/] left)");
-						found.Add(url);
+						if (Regex.IsMatch(url) && !IgnoreRegex.IsMatch(url))
+						{
+							AnsiConsole.MarkupLine($"[bold green]{url}[/] - {(int)res.StatusCode} {res.StatusCode.ToString()} ([bold]{queue.Count}[/] left)");
+							found.Add(url);
+						}
+						
 						lock (queueLock) if (queue.Count == 0) stop = true;
 					}
 					catch (Exception e)
