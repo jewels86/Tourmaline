@@ -32,3 +32,7 @@ Flags:
 - Finish!
 - Add program to `apt` (`gold-team:tourmaline`)
 - Add web scraping
+- Add brute depth
+- Finish CMS detection
+	- Create the wordlists
+- Add some prictures to readme
