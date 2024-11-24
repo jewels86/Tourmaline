@@ -14,10 +14,7 @@ namespace Tourmaline.Enumerators
 		public string OutFile { get; set; }
 		public bool Debug { get; set; }
 
-		public Dictionary<string, string> CMSToList { get; set; } = new()
-		{
-			{ "joolma", Path.Combine(AppContext.BaseDirectory, "wordlists", "joolma.txt") }
-		};
+		public Dictionary<string, Func<string, float>> CMSs = new();
 
 		public CMS(CMSCommand.Settings settings, string[] wordlist)
 		{
