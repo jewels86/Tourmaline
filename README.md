@@ -26,3 +26,9 @@ To brute force directories, Tourmaline reads a wordlist and tries every path lis
 
 Command: `tourmaline brute <URL> [WORDLIST]`
 
+Flags:
+- `-d|--depth`: The number of times to recurse through found directories (best used with smaller wordlists)
+## Todos
+- Finish!
+- Add program to `apt` (`gold-team:tourmaline`)
+- Add web scraping
