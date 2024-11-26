@@ -28,6 +28,13 @@ Command: `tourmaline brute <URL> [WORDLIST]`
 
 Flags:
 - `-d|--depth`: The number of times to recurse through found directories (best used with smaller wordlists)
+
+### CMS Detection
+**CMS Detection** refers to the process of identifying the content manager service of a website (wordpress, joomla, drupal).
+
+Command: `tourmaline cms <URL>`
+
+Note: this command has no other flags. It also doesn't use the `threads` global flag.
 ## Todos
 - Finish!
 - Add program to `apt` (`gold-team:tourmaline`)
