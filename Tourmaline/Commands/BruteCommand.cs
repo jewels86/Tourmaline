@@ -20,10 +20,13 @@ namespace Tourmaline.Commands
 			public string Wordlist { get; set; } = string.Empty;
 
 			[CommandOption("-t|--threads <THREADS>")]
-			public int Threads { get; set; } = 4;
+			public int Threads { get; set; } = 12;
 
 			[CommandOption("-o|--outfiles <OUTFILE>")]
 			public string OutFile { get; set; } = string.Empty;
+
+			[CommandOption("-d|--depth <DEPTH>")]
+			public int Depth { get; set; } = 1;
 
 			[CommandOption("--outfile-bare")]
 			public bool OutFileBare { get; set; } = false;
@@ -70,6 +73,7 @@ namespace Tourmaline.Commands
 			table.AddRow("Debug Mode", settings.Debug.ToString());
 			table.AddEmptyRow();
 
+			table.AddRow("Depth", settings.Depth.ToString());
 			table.AddRow("Wordlist", settings.Wordlist);
 			table.AddEmptyRow();
 
