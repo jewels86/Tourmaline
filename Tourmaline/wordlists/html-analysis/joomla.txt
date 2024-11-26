@@ -1,0 +1,3 @@
+<meta name="generator" content="Joomla! - Open Source Content Management">
+<jdoc:include type="modules" name="position-x" />
+<link href="/templates/system/css/system.css" rel="stylesheet">

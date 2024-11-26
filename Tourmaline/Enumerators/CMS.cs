@@ -10,16 +10,12 @@ namespace Tourmaline.Enumerators
 	internal class CMS
 	{
 		public string URL { get; set; }
-		public int Threads { get; set; }
 		public string OutFile { get; set; }
 		public bool Debug { get; set; }
-
-		public Dictionary<string, Func<string, float>> CMSs = new();
 
 		public CMS(CMSCommand.Settings settings)
 		{
 			URL = Functions.RemoveTrailingSlash(settings.URL);
-			Threads = settings.Threads;
 			OutFile = settings.OutFile;
 			Debug = settings.Debug;
 		}
@@ -27,11 +23,16 @@ namespace Tourmaline.Enumerators
 		public async Task Enumerate()
 		{
 			List<string> found = new();
-			Task[] tasks = new Task[Threads];
 			HttpClient client = new();
-
+			
 			if (Debug) Console.WriteLine("Starting CMS detection...");
-			AnsiConsole.MarkupLine((await CMSFuncs.Wordpress(URL, client)).ToString());
+
+			string wordpressScore = await CMSFuncs.Wordpress(URL, client, Debug);
+			string joomlaScore = await CMSFuncs.Joomla(URL, client, Debug);
+
+			AnsiConsole.MarkupLine("[green]CMS detection complete![/]");
+			AnsiConsole.MarkupLine($"[green]Wordpress[/]: {wordpressScore}");
+			AnsiConsole.MarkupLine($"[green]Joomla[/]: {joomlaScore}");
 		}
 	}
 }

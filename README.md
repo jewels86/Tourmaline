@@ -33,7 +33,7 @@ Flags:
 - Add program to `apt` (`gold-team:tourmaline`)
 - Add web scraping
 - Add brute depth
-- Update number of threads in the spider
+- ~~Update number of threads in the spider~~
 - API fuzzing
 - Finish CMS detection
 	- Create the wordlists

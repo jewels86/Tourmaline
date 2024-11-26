@@ -1,0 +1,3 @@
+<link rel="https://api.w.org/" href="/wp-json/">
+<meta name="generator" content="WordPress
+<script>window._wpemojiSettings</script>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -99,7 +100,7 @@ namespace Tourmaline
 
 		internal async static Task<float> ScorePaths(string url, string name, HttpClient client)
 		{
-			string[] file = await File.ReadAllLinesAsync(Path.Combine(AppContext.BaseDirectory, "wordlists", $"{name}.txt"));
+			string[] file = await File.ReadAllLinesAsync(Path.Combine(AppContext.BaseDirectory, "wordlists", "cms-fuzzing", $"{name}.txt"));
 			Dictionary<string, int> files = ParseCMSFile(file);
 
 			int pathsScore = 0;
@@ -109,7 +110,7 @@ namespace Tourmaline
 				string p = kvp.Key;
 				int s = kvp.Value;
 
-				HttpResponseMessage res = await client.GetAsync(Functions.ResolveURL(url, p));
+				HttpResponseMessage res = await client.GetAsync(ResolveURL(url, p));
 				if (res.IsSuccessStatusCode)
 				{
 					pathsScore += s;
@@ -117,6 +118,22 @@ namespace Tourmaline
 			}
 
 			return 100 * (pathsScore / files.Count);
+		}
+		internal async static Task<float> AnalyzeHTML(string name, HttpResponseMessage res)
+		{
+			string[] tags = ReadFileAsLines(Path.Combine(AppContext.BaseDirectory, "wordlists", "html-analysis", $"{name}.txt"));
+			string html = await res.Content.ReadAsStringAsync();
+			int htmlScore = 0;
+
+			foreach (string tag in tags)
+			{
+				if (html.Contains(tag))
+				{
+					htmlScore += 1;
+				}
+			}
+
+			return htmlScore / tags.Length;
 		}
 	}
 }

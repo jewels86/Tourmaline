@@ -18,7 +18,7 @@ namespace Tourmaline.Commands
 			public required string URL { get; set; }
 
 			[CommandOption("-t|--threads <THREADS>")]
-			public int Threads { get; set; } = 4;
+			public int Threads { get; set; } = 12;
 
 			[CommandOption("-o|--outfiles <OUTFILE>")]
 			public string OutFile { get; set; } = string.Empty;
