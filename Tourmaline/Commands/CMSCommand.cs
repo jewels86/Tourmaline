@@ -16,9 +16,6 @@ namespace Tourmaline.Commands
 			[CommandArgument(0, "<URL>")]
 			public required string URL { get; set; }
 
-			[CommandOption("-t|--threads <THREADS>")]
-			public int Threads { get; set; } = 4;
-
 			[CommandOption("-o|--outfiles <OUTFILE>")]
 			public string OutFile { get; set; } = string.Empty;
 
@@ -39,7 +36,6 @@ namespace Tourmaline.Commands
 
 			table.AddRow("URL", settings.URL);
 			table.AddRow("Mode", "CMS Detection");
-			table.AddRow("Threads", settings.Threads.ToString());
 			table.AddRow("Outfile", settings.OutFile == string.Empty ? "No outfile specified." : settings.OutFile);
 			table.AddRow("Debug Mode", settings.Debug.ToString());
 			table.AddEmptyRow();

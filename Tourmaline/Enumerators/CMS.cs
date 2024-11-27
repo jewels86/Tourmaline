@@ -29,10 +29,12 @@ namespace Tourmaline.Enumerators
 
 			string wordpressScore = await CMSFuncs.Wordpress(URL, client, Debug);
 			string joomlaScore = await CMSFuncs.Joomla(URL, client, Debug);
+			string drupalScore = await CMSFuncs.Drupal(URL, client, Debug);
 
 			AnsiConsole.MarkupLine("[green]CMS detection complete![/]");
 			AnsiConsole.MarkupLine($"[green]Wordpress[/]: {wordpressScore}");
 			AnsiConsole.MarkupLine($"[green]Joomla[/]: {joomlaScore}");
+			AnsiConsole.MarkupLine($"[green]Drupal[/]: {drupalScore}");
 		}
 	}
 }
