@@ -43,5 +43,5 @@ Note: this command has no other flags. It also doesn't use the `threads` global 
 - ~~Update number of threads in the spider~~
 - API fuzzing
 - Finish CMS detection
-	- Create the wordlists (drupal, ~~wordpress~~, ~~joomla~~)
+	- Create the wordlists (~~drupal~~, ~~wordpress~~, ~~joomla~~)
 - Add some pictures to readme

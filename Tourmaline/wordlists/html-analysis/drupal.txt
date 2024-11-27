@@ -1,0 +1,3 @@
+<meta name="Generator" content="Drupal
+<script type="application/json" data-drupal-selector="drupal-settings-json">
+data-drupal

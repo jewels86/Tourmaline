@@ -1,0 +1,5 @@
+/node: 7
+/user: 7
+/admin: 5
+/core: 7
+/update.php: 7
