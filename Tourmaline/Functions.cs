@@ -135,5 +135,12 @@ namespace Tourmaline
 
 			return htmlScore / tags.Length;
 		}
+		internal static string ResolveVersionsToRange(List<string> versions)
+		{
+			versions = versions.OrderBy(v => new Version(v)).ToList();
+			Version min = new(versions.First());
+			Version max = new(versions.Last());
+			return $"{min}-{max}";
+		}
 	}
 }

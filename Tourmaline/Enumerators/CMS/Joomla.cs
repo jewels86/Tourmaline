@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Tourmaline;
@@ -38,6 +39,20 @@ internal static partial class CMSFuncs
 
 		if (debug) Console.WriteLine($"Final Score: {score}");
 
-		return $"{score}% accuracy (No other notes)";
+		string version = "No version found";
+
+		Regex regex = new Regex(@"\?version=(\d+\.\d+(\.\d+)?)", RegexOptions.IgnoreCase);
+		Match match = regex.Match(url);
+
+		if (match.Success)
+		{
+			version = match.Groups[1].Value;
+		}
+		else
+		{
+
+		}
+
+		return $"{score}% accuracy ({version})";
 	}
 }
