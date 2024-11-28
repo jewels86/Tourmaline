@@ -24,17 +24,27 @@ namespace Tourmaline.Enumerators
 		{
 			List<string> found = new();
 			HttpClient client = new();
-			
+
 			if (Debug) Console.WriteLine("Starting CMS detection...");
 
-			string wordpressScore = await CMSFuncs.Wordpress(URL, client, Debug);
-			string joomlaScore = await CMSFuncs.Joomla(URL, client, Debug);
-			string drupalScore = await CMSFuncs.Drupal(URL, client, Debug);
+			(float wordpressScore, string wordpress) = await CMSFuncs.Wordpress(URL, client, Debug);
+			(float joomlaScore, string joomla) = await CMSFuncs.Joomla(URL, client, Debug);
+			(float drupalScore, string drupal) = await CMSFuncs.Drupal(URL, client, Debug);
+
+			var scores = new List<(float score, string val)>
+			{
+				(wordpressScore, wordpress),
+				(joomlaScore, joomla),
+				(drupalScore, drupal)
+			};
+
+			scores.Sort((x, y) => y.score.CompareTo(x.score));
 
 			AnsiConsole.MarkupLine("[green]CMS detection complete![/]");
-			AnsiConsole.MarkupLine($"[green]Wordpress[/]: {wordpressScore}");
-			AnsiConsole.MarkupLine($"[green]Joomla[/]: {joomlaScore}");
-			AnsiConsole.MarkupLine($"[green]Drupal[/]: {drupalScore}");
+			foreach (var (score, val) in scores)
+			{
+				AnsiConsole.MarkupLine(val);
+			}
 		}
 	}
 }

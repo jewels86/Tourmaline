@@ -7,7 +7,7 @@ namespace Tourmaline;
 
 internal static partial class CMSFuncs
 {
-	internal static async Task<string> Joomla(string url, HttpClient client, bool debug)
+	internal static async Task<(float, string)> Joomla(string url, HttpClient client, bool debug)
 	{
 		float score = 0;
 		HttpResponseMessage res = await client.GetAsync(url);
@@ -53,6 +53,6 @@ internal static partial class CMSFuncs
 
 		}
 
-		return $"{score}% accuracy ({version})";
+		return (score, $"[green]Joomla[/]: {score}% accuracy ({version})");
 	}
 }

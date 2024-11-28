@@ -7,7 +7,7 @@ namespace Tourmaline;
 
 internal static partial class CMSFuncs
 {
-    internal static async Task<string> Wordpress(string url, HttpClient client, bool debug) 
+    internal static async Task<(float, string)> Wordpress(string url, HttpClient client, bool debug) 
     {
         float score = 0;
 		HttpResponseMessage res = await client.GetAsync(url);
@@ -69,10 +69,10 @@ internal static partial class CMSFuncs
 			if (match2.Success)
 			{
 				version = match2.Groups[1].Value;
-				Console.WriteLine($"Version: {version}");
+				score += 10;
 			}
 		}
 
-		return $"{score}% ({version})";
+		return (score, $"[green]Wordpress[/]: {score}% accuracy ({version})");
 	}
 }

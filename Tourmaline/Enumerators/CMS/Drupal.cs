@@ -6,7 +6,7 @@ namespace Tourmaline;
 
 internal static partial class CMSFuncs
 {
-	internal static async Task<string> Drupal(string url, HttpClient client, bool debug)
+	internal static async Task<(float, string)> Drupal(string url, HttpClient client, bool debug)
 	{
 		float score = 0;
 		HttpResponseMessage res = await client.GetAsync(url);
@@ -29,6 +29,6 @@ internal static partial class CMSFuncs
 		score += headerScore / headers.Length;
 		score = score / 3;
 
-		return $"{score}% accuracy (No other notes - coming soon)";
+		return (score, $"[green]Drupal[/]: {score}% accuracy (No other notes - coming soon)");
 	}
 }
