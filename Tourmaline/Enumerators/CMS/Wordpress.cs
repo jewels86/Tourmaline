@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace Tourmaline;
 
@@ -45,6 +46,33 @@ internal static partial class CMSFuncs
 		score += patternScore / 1;
 		score = (score / 4);
 
-		return $"{score}% (No other notes)";
+		string version = "No version found";
+		string content = await res.Content.ReadAsStringAsync();
+
+		Regex regex1 = new Regex(@"<meta name=[""']generator[""'] content=[""']WordPress (\d+\.\d+(\.\d+)?)[""']>", RegexOptions.IgnoreCase);
+		Match match1 = regex1.Match(content);
+
+		if (match1.Success)
+		{
+			version = match1.Groups[1].Value;
+			Console.WriteLine($"Version: {version}");
+		}
+
+		if (!match1.Success)
+		{
+			HttpResponseMessage rssFeed = await client.GetAsync(Functions.ResolveURL(url, "feed"));
+			string rssContent = await rssFeed.Content.ReadAsStringAsync();
+
+			Regex regex2 = new Regex(@"<generator>https://wordpress.org/\?v=(\d+\.\d+(\.\d+)?)</generator>", RegexOptions.IgnoreCase);
+			Match match2 = regex2.Match(rssContent);
+
+			if (match2.Success)
+			{
+				version = match2.Groups[1].Value;
+				Console.WriteLine($"Version: {version}");
+			}
+		}
+
+		return $"{score}% ({version})";
 	}
 }
