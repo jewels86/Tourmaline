@@ -38,9 +38,7 @@ Note: this command has no other flags. It also doesn't use the `threads` global 
 ## Todos
 - Finish!
 - Add program to `apt` (`gold-team:tourmaline`)
-- Add web scraping (next)
 - ~~Add brute depth~~
 - ~~Update number of threads in the spider~~
-- API fuzzing
 - ~~Finish CMS detection~~
 - Add some pictures to readme
