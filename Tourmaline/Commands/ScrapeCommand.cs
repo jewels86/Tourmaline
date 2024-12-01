@@ -36,6 +36,9 @@ namespace Tourmaline.Commands
 			[CommandOption("-p|--pages <PAGES-FILE>")]
 			public string Pages { get; set; } = string.Empty;
 
+			[CommandOption("--outfiles-dir <OUTFILES-DIR>")]
+			public string OutFilesDir { get; set; } = string.Empty;
+
 			public string[] Paths = []; 
 		}
 
@@ -62,7 +65,52 @@ namespace Tourmaline.Commands
 			table.AddRow("License", "GPL-3.0");
 			table.AddRow("Author", "Gold Team");
 
+			try
+			{
+				if (settings.Debug) Console.WriteLine("Preparing...");
+				await Task.Delay(5000);
+				if (!await Prepare(settings))
+				{
+					AnsiConsole.MarkupLine("[green]Tourmaline[/] is exiting (Error in preparation).");
+					return -1;
+				}
+			}
+			catch (Exception e)
+			{
+				AnsiConsole.MarkupLine($"[red]Error:[/] {e.Message}");
+				return 1;
+			}
+
+
+
 			return 0;
+		}
+
+		private async Task<bool> Prepare(Settings settings)
+		{
+			if (settings.URL == string.Empty)
+			{
+				AnsiConsole.MarkupLine("[red]Error:[/] No URL specified.");
+				return false;
+			}
+
+			try
+			{
+				using HttpClient client = new();
+				HttpResponseMessage response = await client.GetAsync(settings.URL);
+				if (!response.IsSuccessStatusCode)
+				{
+					AnsiConsole.MarkupLine("[red]Error:[/] Failed to reach the URL.");
+					return false;
+				}
+			}
+			catch (Exception ex)
+			{
+				AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message}");
+				return false;
+			}
+
+			return true;
 		}
 	}
 }
