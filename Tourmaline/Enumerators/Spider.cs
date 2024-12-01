@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.AccessControl;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -41,7 +43,7 @@ namespace Tourmaline.Enumerators
 			ForceIgnore = settings.ForceIgnore;
 		}
 
-		public async Task Enumerate()
+		public async Task<List<string>> Enumerate(Action<string, HttpStatusCode, int> action)
 		{
 			Queue<string> queue = new(Known.Append(URL));
 			List<string> found = new();
@@ -98,7 +100,7 @@ namespace Tourmaline.Enumerators
 
 						if (Regex.IsMatch(url) && !IgnoreRegex.IsMatch(url))
 						{
-							AnsiConsole.MarkupLine($"[bold green]{url}[/] - {(int)res.StatusCode} {res.StatusCode.ToString()} ([bold]{queue.Count}[/] left)");
+							action(url, res.StatusCode, queue.Count);
 							found.Add(url);
 						}
 						
@@ -122,6 +124,7 @@ namespace Tourmaline.Enumerators
 			await Task.WhenAll(tasks);
 
 			client.Dispose();
+			return found;
 		}
 
 		public string ProcessURL(string url)

@@ -20,7 +20,7 @@ namespace Tourmaline.Enumerators
 			Debug = settings.Debug;
 		}
 
-		public async Task Enumerate()
+		public async Task<List<(float score, string val)>> Enumerate()
 		{
 			List<string> found = new();
 			HttpClient client = new();
@@ -40,11 +40,7 @@ namespace Tourmaline.Enumerators
 
 			scores.Sort((x, y) => y.score.CompareTo(x.score));
 
-			AnsiConsole.MarkupLine("[green]CMS detection complete![/]");
-			foreach (var (score, val) in scores)
-			{
-				AnsiConsole.MarkupLine(val);
-			}
+			return scores;
 		}
 	}
 }

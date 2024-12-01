@@ -7,6 +7,7 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using static Tourmaline.Functions;
 using Tourmaline.Enumerators;
+using System.Net;
 
 namespace Tourmaline.Commands
 {
@@ -120,7 +121,8 @@ namespace Tourmaline.Commands
 			if (settings.Debug) Console.WriteLine("Preparation complete.");
 
 			Spider spider = new(settings);
-			await spider.Enumerate();
+			Action<string, HttpStatusCode, int> action = (a, b, c) => AnsiConsole.WriteLine($"[bold green]{a}[/] - {(int)b} {b.ToString()} ([bold]{c}[/] left)");
+			await spider.Enumerate(action);
 
 			return 0;
 		}

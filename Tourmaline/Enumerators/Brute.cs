@@ -2,6 +2,7 @@
 using Spectre.Console;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Net;
 using Tourmaline.Commands;
 
 namespace Tourmaline.Enumerators 
@@ -25,7 +26,7 @@ namespace Tourmaline.Enumerators
 			Depth = settings.Depth;
 		}
 
-		public async Task Enumerate()
+		public async Task<List<string>> Enumerate(Action<string, HttpStatusCode, int> action)
 		{
 			List<string> found = new();
 			Task[] tasks = new Task[Threads];
@@ -52,7 +53,7 @@ namespace Tourmaline.Enumerators
 					if (res.IsSuccessStatusCode)
 					{
 						found.Add(url);
-						AnsiConsole.MarkupLine($"[bold green]{Functions.ResolveURL(URL, url)}[/] - {(int)res.StatusCode} {res.StatusCode.ToString()} ([bold]{queue.Count}[/] left)");
+						action(Functions.ResolveURL(URL, url), res.StatusCode, queue.Count);
 
 						if (depth < Depth)
 						{
@@ -79,6 +80,7 @@ namespace Tourmaline.Enumerators
 			await Task.WhenAll(tasks);
 
 			client.Dispose();
+			return found;
 		}
 	}
 }

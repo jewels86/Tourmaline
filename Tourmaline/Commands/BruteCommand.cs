@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Spectre.Console;
@@ -106,7 +107,8 @@ namespace Tourmaline.Commands
 			if (settings.Debug) Console.WriteLine("Preparation complete.");
 
 			Brute brute = new(settings, paths);
-			await brute.Enumerate();
+			Action<string, HttpStatusCode, int> action = (a, b, c) => AnsiConsole.WriteLine($"[bold green]{a}[/] - {(int)b} {b.ToString()} ([bold]{c}[/] left)");
+			await brute.Enumerate(action);
 
 			return 0;
 		}

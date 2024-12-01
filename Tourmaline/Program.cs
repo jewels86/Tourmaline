@@ -16,6 +16,7 @@ public static class Program
             config.AddCommand<SpiderCommand>("spider");
             config.AddCommand<BruteCommand>("brute");
             config.AddCommand<CMSCommand>("cms");
+            config.AddCommand<ScanCommand>("scan");
 		});
 
 		return await app.RunAsync(args);

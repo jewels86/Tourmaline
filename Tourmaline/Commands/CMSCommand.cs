@@ -69,7 +69,13 @@ namespace Tourmaline.Commands
 			if (settings.Debug) Console.WriteLine("Preparation complete.");
 
 			CMS cms = new(settings);
-			await cms.Enumerate();
+			var scores = await cms.Enumerate();
+
+			AnsiConsole.MarkupLine("[green]CMS detection complete![/]");
+			foreach (var (score, val) in scores)
+			{
+				AnsiConsole.MarkupLine(val);
+			}
 
 			return 0;
 		}

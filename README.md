@@ -40,5 +40,7 @@ Note: this command has no other flags. It also doesn't use the `threads` global 
 - Add program to `apt` (`gold-team:tourmaline`)
 - ~~Add brute depth~~
 - ~~Update number of threads in the spider~~
-- ~~Finish CMS detection~~
+- Finish CMS detection
+- API Fuzzing
+- Web Scraping
 - Add some pictures to readme
