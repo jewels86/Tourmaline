@@ -53,8 +53,6 @@ namespace Tourmaline.Commands
 
 			AnsiConsole.Write(table);
 
-			Status status = AnsiConsole.Status();
-			status.Spinner = Spinner.Known.Dots;
 			try
 			{
 				if (settings.Debug) Console.WriteLine("Preparing...");
@@ -71,12 +69,10 @@ namespace Tourmaline.Commands
 				return 1;
 			}
 
-			AnsiConsole.MarkupLine("[green]Scan starting...[/]");
-
 			Status scanStatus = AnsiConsole.Status();
 			scanStatus.Spinner = Spinner.Known.Dots;
 			List<string> found = new();
-			await scanStatus.Start("Starting tasks...", async action =>
+			await scanStatus.StartAsync("Starting tasks...", async action =>
 			{
 				List<(float score, string cmsName)> cmsResults = new();
 
@@ -106,6 +102,9 @@ namespace Tourmaline.Commands
 				{
 					paths = Functions.ReadFileAsLines(settings.Wordlist);
 				}
+
+				action.Status("Brute forcing starting...");
+
 				Brute brute = new(new BruteCommand.Settings
 				{
 					URL = settings.URL,
@@ -115,7 +114,8 @@ namespace Tourmaline.Commands
 					Wordlist = settings.Wordlist
 				}, paths);
 				tasks.Add(Task.Run(async () => found.AddRange(await brute.Enumerate((a, b, c) => { }))));
-				action.Status("Brute forcing started...");
+
+				action.Status("Waiting for tasks (CMS)...");
 
 				await tasks[0];
 				string cmsResult = cmsResults[0].cmsName.Split(":")[0].ToLower();
@@ -141,6 +141,8 @@ namespace Tourmaline.Commands
 					}, paths);	
 					tasks.Add(Task.Run(async () => found.AddRange(await brute2.Enumerate((a, b, c) => { }))));
 				}
+
+				action.Status("Waiting for tasks (Brute)...");
 
 				Task.WaitAll(tasks.ToArray());
 
@@ -168,6 +170,28 @@ namespace Tourmaline.Commands
 
 		private async Task<bool> Prepare(Settings settings)
 		{
+			if (settings.URL == string.Empty)
+			{
+				AnsiConsole.MarkupLine("[red]Error:[/] No URL specified.");
+				return false;
+			}
+
+			try
+			{
+				using HttpClient client = new();
+				HttpResponseMessage response = await client.GetAsync(settings.URL);
+				if (!response.IsSuccessStatusCode)
+				{
+					AnsiConsole.MarkupLine("[red]Error:[/] Failed to reach the URL.");
+					return false;
+				}
+			}
+			catch (Exception ex)
+			{
+				AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message}");
+				return false;
+			}
+
 			return true;
 		}
 	}

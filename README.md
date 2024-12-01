@@ -35,6 +35,15 @@ Flags:
 Command: `tourmaline cms <URL>`
 
 Note: this command has no other flags. It also doesn't use the `threads` global flag.
+
+### Scan
+The scan command is a combination of the spider, CMS, and brute commands. It first identifies the CMS, uses the brute to find directories, and then uses the spider to do a final sweep.
+
+Command: `tourmaline scan <URL>`
+
+Flags:
+- `-w|--wordlist <WORDLIST>`: The wordlist to use for brute forcing.
+
 ## Todos
 - Finish!
 - Add program to `apt` (`gold-team:tourmaline`)
