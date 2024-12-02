@@ -17,11 +17,8 @@ public static class Program
 			config.AddCommand<BruteCommand>("brute");
 			config.AddCommand<CMSCommand>("cms");
 			config.AddCommand<ScanCommand>("scan");
-			config.AddBranch("scrape", (scraper) =>
-			{
-				scraper.AddCommand<FileScraperCommand>("files");
-
-			});
+			config.AddCommand<FileScraperCommand>("fscraper");
+			config.AddCommand<DataScraperCommand>("dscraper");
 		});
 
 		return await app.RunAsync(args);
