@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Tourmaline.Commands;
 using System.Net;
+using Spectre.Console;
 
 namespace Tourmaline.Enumerators
 {
@@ -35,6 +36,11 @@ namespace Tourmaline.Enumerators
 
 			object queueLock = new();
 
+			if (!Directory.Exists(OutFileDir))
+			{
+				Directory.CreateDirectory(OutFileDir);
+			}
+
 			Func<Task> thread = async () =>
 			{
 				while (!stop)
@@ -51,6 +57,8 @@ namespace Tourmaline.Enumerators
 						lock (queueLock) url = queue.Dequeue();
 						HttpResponseMessage res;
 
+						if (Debug) Console.WriteLine($"Downloading {url}");
+
 						try { res = await client.GetAsync(url); }
 						catch { continue; }
 
@@ -59,13 +67,14 @@ namespace Tourmaline.Enumerators
 						string fileName = Path.GetFileName(url);
 						string filePath = Path.Combine(OutFileDir, fileName);
 
-						using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+						using (var fileStream = File.Create(filePath))
 						{
+							if (Debug) AnsiConsole.WriteLine($"Writing {url} to {filePath}");
 							await res.Content.CopyToAsync(fileStream);
 						}
 
+						if (Debug) Console.WriteLine($"Downloaded {url}");
 						action(url, res.StatusCode, queue.Count);
-						found.Add(url);
 
 						lock (queueLock) if (queue.Count == 0) stop = true;
 					}

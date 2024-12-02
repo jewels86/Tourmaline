@@ -132,6 +132,8 @@ namespace Tourmaline.Enumerators
 
 			await Task.WhenAll(tasks);
 
+			await File.WriteAllLinesAsync(OutFile, found);
+
 			client.Dispose();
 			return found;
 		}

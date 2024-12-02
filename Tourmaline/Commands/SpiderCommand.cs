@@ -24,9 +24,6 @@ namespace Tourmaline.Commands
 			[CommandOption("-o|--outfiles <OUTFILE>")]
 			public string OutFile { get; set; } = string.Empty;
 
-			[CommandOption("--outfile-bare")]
-			public bool OutFileBare { get; set; } = false;
-
 			[CommandOption("--debug")]
 			public bool Debug { get; set; } = false;
 
