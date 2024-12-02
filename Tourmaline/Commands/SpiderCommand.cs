@@ -54,6 +54,12 @@ namespace Tourmaline.Commands
 			[CommandOption("--known-file <KNOWN-FILE>")]
 			public string KnownFile { get; set; } = string.Empty;
 
+			[CommandOption("-l|--limit <LIMIT>")]
+			public int Limit { get; set; } = -1;
+
+			[CommandOption("--force-limit")]
+			public bool ForceLimit { get; set; } = false;
+
 			public string[] Known { get; set; } = [];
 		}
 
@@ -121,7 +127,7 @@ namespace Tourmaline.Commands
 			if (settings.Debug) Console.WriteLine("Preparation complete.");
 
 			Spider spider = new(settings);
-			Action<string, HttpStatusCode, int> action = (a, b, c) => AnsiConsole.WriteLine($"[bold green]{a}[/] - {(int)b} {b.ToString()} ([bold]{c}[/] left)");
+			Action<string, HttpStatusCode, int> action = (a, b, c) => AnsiConsole.MarkupLine($"[bold green]{a}[/] - {(int)b} {b.ToString()} ([bold]{c}[/] left)");
 			await spider.Enumerate(action);
 
 			return 0;

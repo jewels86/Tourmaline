@@ -24,6 +24,8 @@ namespace Tourmaline.Enumerators
 		public string[] Known { get; set; }
 		public bool ForceRegex { get; set; }
 		public bool ForceIgnore { get; set; }
+		public int Limit { get; set; }
+		public bool ForceLimit { get; set; }
 
 		public Regex JSPathFinder = new(@"['""]([a-zA-Z0-9\\\/\.?!#,=:;&% ]+[\\\/\.][a-zA-Z0-9\\\/\.?!#,=:;&% ]+)['""]");
 		public Regex HTMLPathFinder = new(@"(src|href|action)=""([a-zA-Z0-9\\\/\.?!#,=:;&% ]+)""");
@@ -41,6 +43,8 @@ namespace Tourmaline.Enumerators
 			Known = Functions.ResolveURLs(URL, settings.Known);
 			ForceRegex = settings.ForceRegex;
 			ForceIgnore = settings.ForceIgnore;
+			Limit = settings.Limit;
+			ForceLimit = settings.ForceLimit;
 		}
 
 		public async Task<List<string>> Enumerate(Action<string, HttpStatusCode, int> action)
@@ -50,6 +54,7 @@ namespace Tourmaline.Enumerators
 			Task[] tasks = new Task[Threads];
 			HttpClient client = new();
 			bool stop = false;
+			int total = 0;
 
 			object queueLock = new();
 
@@ -65,6 +70,8 @@ namespace Tourmaline.Enumerators
 
 					try
 					{
+						lock (queueLock) if (ReachedLimit(total) && ForceLimit) stop = true;
+
 						string url;
 						lock (queueLock) url = queue.Dequeue();
 						HttpResponseMessage res;
@@ -102,8 +109,10 @@ namespace Tourmaline.Enumerators
 						{
 							action(url, res.StatusCode, queue.Count);
 							found.Add(url);
+							if (ReachedLimit(found.Count)) stop = true;
 						}
-						
+
+						total += 1;
 						lock (queueLock) if (queue.Count == 0) stop = true;
 					}
 					catch (Exception e)
@@ -145,6 +154,12 @@ namespace Tourmaline.Enumerators
 
 			string[] parts = path.Split("/");
 			return parts.Length <= Depth;
+		}
+
+		public bool ReachedLimit(int count)
+		{
+			if (Limit == -1) return false;
+			return count >= Limit;
 		}
 	}
 }
