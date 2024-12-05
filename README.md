@@ -46,10 +46,16 @@ Flags:
 
 ## Todos
 - Finish!
-- Add program to `apt` (`gold-team:tourmaline`)
+- Add program to `apt` (`gold-team/tourmaline`)
 - ~~Add brute depth~~
 - ~~Update number of threads in the spider~~
-- Finish CMS detection
+- ~~Finish CMS detection~~
 - API Fuzzing
-- Web Scraping
+- ~~Web Scraping~~
 - Add some pictures to readme
+
+### Small Todos
+- Add a `--version` flag
+- Add squarespace and wix to CMS detection
+- Add `--no-`something flags to scan 
+- Add data scraper flags like get surounding characters/current tag
