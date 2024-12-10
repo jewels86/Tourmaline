@@ -1,25 +1,26 @@
 ﻿using System;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using Spectre.Console;
 using Spectre.Console.Cli;
-using Tourmaline;
-using Tourmaline.Scripts;
+using Tourmaline.Commands;
 
-namespace Tourmaline
+public static class Program
 {
-	public static class Program
+	public static async Task<int> Main(string[] args)
 	{
+		CommandApp app = new CommandApp();
 
-		public static void Main(string[] args)
+		app.Configure(config =>
 		{
-			CommandApp app = new();
-			app.Configure(config =>
-			{
-				config.AddCommand<SpiderCommand>("spider");
-				config.AddCommand<BruteCommand>("brute");
-				config.AddCommand<BuilderCommand>("build");
-				config.AddCommand<EnumerateCommand>("enumerate");
-			});
-			app.Run(args);
-		}
+			config.AddCommand<SpiderCommand>("spider");
+			config.AddCommand<BruteCommand>("brute");
+			config.AddCommand<CMSCommand>("cms");
+			config.AddCommand<ScanCommand>("scan");
+			config.AddCommand<FileScraperCommand>("fscraper");
+			config.AddCommand<DataScraperCommand>("dscraper");
+		});
+
+		return await app.RunAsync(args);
 	}
 }

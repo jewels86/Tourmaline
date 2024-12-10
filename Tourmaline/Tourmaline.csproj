@@ -1,71 +1,46 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<OutputType>Exe</OutputType>
-	<TargetFramework>net8.0</TargetFramework>
-	<ImplicitUsings>enable</ImplicitUsings>
-	<Nullable>enable</Nullable>
-	<RuntimeIdentifiers>win-x64;win-x86;win-arm64;linux-x64;osx-x64</RuntimeIdentifiers>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+	<AssemblyName>tourmaline</AssemblyName>
   </PropertyGroup>
-	
-	<PropertyGroup>
-		
-	</PropertyGroup>
-	
-	<ItemGroup>
-	  <None Remove="uninstall.ps1" />
-	  <None Remove="Wordlists\CMS\WordPress.txt" />
-	  <None Remove="Wordlists\wordlist.txt" />
-	</ItemGroup>
 
   <ItemGroup>
-	  <PackageReference Include="HtmlAgilityPack" Version="1.11.6" />
-	  <PackageReference Include="Spectre.Console" Version="0.48.0" />
-	<PackageReference Include="Spectre.Console.Cli" Version="0.48.0" />
+    <None Remove="wordlists\cms-fuzzing\drupal.txt" />
+    <None Remove="wordlists\html-analysis\drupal.txt" />
+    <None Remove="wordlists\html-analysis\joomla.txt" />
+    <None Remove="wordlists\html-analysis\wordpress.txt" />
+    <None Remove="wordlists\joolma.txt" />
+    <None Remove="wordlists\wordpress.txt" />
   </ItemGroup>
 
   <ItemGroup>
-	<Resource Include="uninstall.ps1">
-	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</Resource>
-	<Resource Include="Wordlists\CMS\WordPress.txt">
-	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</Resource>
-	<Resource Include="Wordlists\wordlist.txt">
-	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</Resource>
+    <PackageReference Include="Spectre.Console" Version="0.49.1" />
+    <PackageReference Include="Spectre.COnsole.Cli" Version="0.49.1" />
   </ItemGroup>
 
   <ItemGroup>
-	<Compile Update="Properties\Resources.Designer.cs">
-	  <DesignTime>True</DesignTime>
-	  <AutoGen>True</AutoGen>
-	  <DependentUpon>Resources.resx</DependentUpon>
-	</Compile>
+    <Content Include="wordlists\cms-fuzzing\drupal.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wordlists\cms-fuzzing\joomla.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wordlists\cms-fuzzing\wordpress.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wordlists\html-analysis\drupal.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wordlists\html-analysis\joomla.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="wordlists\html-analysis\wordpress.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
-
-  <ItemGroup>
-	<EmbeddedResource Update="Properties\Resources.resx">
-	  <Generator>ResXFileCodeGenerator</Generator>
-	  <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-	</EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-	<None Update="init.ps1">
-	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</None>
-	<None Update="init.sh">
-	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</None>
-  </ItemGroup>
-	<ItemGroup>
-		<Content Include="Wordlists\**">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
-	<ItemGroup>
-	  <None Include="..\.editorconfig" Link=".editorconfig" />
-	</ItemGroup>
 
 </Project>

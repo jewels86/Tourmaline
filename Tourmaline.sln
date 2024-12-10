@@ -3,19 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tourmaline", "Tourmaline\Tourmaline.csproj", "{9558A0E0-A1E0-40FB-B9DC-4E62B6D6D92D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tourmaline", "Tourmaline\Tourmaline.csproj", "{60B4BDF4-B95A-47A0-93C3-5C637E477932}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C2F87A8D-9596-4CF6-BC1C-E508DEF46226}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D5AEEB7C-C977-4D49-BA0E-BF51FB9D2A5D}"
 	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		README.md = README.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Testing", "Testing", "{7A9FDCC3-5FB1-4FAF-B20E-71B575B503CE}"
-	ProjectSection(SolutionItems) = preProject
-		Testing\out.txt = Testing\out.txt
-		Testing\wordlist.txt = Testing\wordlist.txt
 	EndProjectSection
 EndProject
 Global
@@ -24,18 +17,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9558A0E0-A1E0-40FB-B9DC-4E62B6D6D92D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9558A0E0-A1E0-40FB-B9DC-4E62B6D6D92D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9558A0E0-A1E0-40FB-B9DC-4E62B6D6D92D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9558A0E0-A1E0-40FB-B9DC-4E62B6D6D92D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60B4BDF4-B95A-47A0-93C3-5C637E477932}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60B4BDF4-B95A-47A0-93C3-5C637E477932}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60B4BDF4-B95A-47A0-93C3-5C637E477932}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60B4BDF4-B95A-47A0-93C3-5C637E477932}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{7A9FDCC3-5FB1-4FAF-B20E-71B575B503CE} = {C2F87A8D-9596-4CF6-BC1C-E508DEF46226}
-	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {B79AD48A-2C2C-49B8-BFC6-4EF40CCE0C68}
+		SolutionGuid = {58A6359F-D1D0-4596-A467-11EFC80B2BAA}
 	EndGlobalSection
 EndGlobal

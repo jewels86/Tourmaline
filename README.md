@@ -1,65 +1,60 @@
 # Tourmaline
-A tunable all-in-one directory enumeration tool.
-
-![image](https://github.com/Gold-Team-Projects/Tourmaline-Directory_Enumerator/assets/165838882/02c94d21-d65f-4f00-9c5e-f5d28e9f94c0)
-
-Latest release: v1.18
-## Credits
-`wordlist.txt` is from [`dirb common.txt`](https://github.com/3ndG4me/KaliLists/blob/master/dirb/common.txt).
-## Installation
-This installation process needs refinement, but this works for now.
-### Linux
-Download the newest release's `linux-x64.zip` and extract it. Then run the command `source init.sh` from inside the directory, then `source ~/.bashrc`. This sets the alias so the app is ready to be used.
-### Windows
-Download the newest release's `win-x64.zip` and extract it. Then run the command `./init.ps1` from inside the directory. This sets the alias so the app is ready to be used.
-## Uninstallation
-### Linux
-Still working on it. In the mean time, you can remove the directory and remove its path from ~/.bashrc
-### Windows
-Run the command `./uninstall.ps1`, then remove the directory.
-## Usage
-### Commands
-Tourmaline currently has 4 commands:
-- `spider`: Starts tourmaline in spider mode
-- `brute`: Starts tourmaline in brute force mode
-- `build`: Starts tourmaline in command builder mode
-- `enumerate`: Combines supported methods to find as many paths as possible
+A tunable, all-in-one directory enumeration toolkit.
+## Overview
+**Tourmaline** is a command line tool for web penetration testing. 
+Tourmaline can be used to both find directories and identify a site's CMS.
+## Commands
+### Global Flags
+- `-t|--threads <THREADS>`: The number of threads to use (defaults to `12`)
+- `-o|--outfile <OUTFILE-PATH>`: The path to the outfile (defaults to none)
+- `--debug`: Used to debug Tourmaline (defaults to `false`)
 ### Spider
-The spider is used to find files used in the source code of a site. Here's a basic explanation of its workings:
-1. The spider sends a request to the page given.
-2. The spider scans the page for paths and links and adds them to the queue.
-3. The spider then iterates through the queue and finds more links and paths as it goes.
-Then it returns all paths found.  
-![image](https://github.com/Gold-Team-Projects/Tourmaline-Directory_Enumerator/assets/165838882/d8290b6e-c577-4364-a260-cda25afcf8af)
+Tourmaline's spider creates a queue from links on pages, which it then iterates through to find more paths.
 
-
-#### Flags
-- `-m`: Sets the max amount of paths to find and iterate through.
-- `-r`: All files with names that don't match this regex are ignored.
-- `-i`: All files with names matching this regex are ignored.
-- `-o`: The file to write results to.
-- `-t`: The amount of threads to use. (4)
-Other options are specified in the `tourmaline spider -h` command.
-
-### Brute
-The brute forcer is used to find pages served by the site. It needs a wordlist to function.
-It pretty much just sends requests to every path on the wordlist and logs successful attempts. 
-
+Command: `tourmaline spider <URL>`
 
 Flags:
-- `-t`: The number of threads to use during enumeration. (4)
-- `-o`: The file to write results to.
+- `-d|--depth <MAX-DEPTH>`: The max depth the paths can reach.
+- `-r|--regex <REGEX>`: A regex all paths must match to be added to the output. (Note: paths will still be added to the queue.)
+- `-i|--ignore <IGNORE>`: A regex paths must not match to be added to the output. (Note: paths will still be added to the queue.)
+- `--force-regex`: Paths not matching the `-r` regex will not be added to the queue.
+- `--force-ignore`: Paths matching the `-i` regex will not be added to the queue.
+- `-k|--known <PATHS>`: Paths that should initially be added to the queue (comma-separated)
 
-### Enumerate
-This command combines many methods to find many paths.
+### Brute
+To brute force directories, Tourmaline reads a wordlist and tries every path listed.
 
-### Build
-The build command is used to generate commands for tourmaline. You enter some information about the purpose and it gives you a command.
+Command: `tourmaline brute <URL> [WORDLIST]`
 
-This isn't finished yet.
+Flags:
+- `-d|--depth`: The number of times to recurse through found directories (best used with smaller wordlists)
+
+### CMS Detection
+**CMS Detection** refers to the process of identifying the content manager service of a website (wordpress, joomla, drupal).
+
+Command: `tourmaline cms <URL>`
+
+Note: this command has no other flags. It also doesn't use the `threads` global flag.
+
+### Scan
+The scan command is a combination of the spider, CMS, and brute commands. It first identifies the CMS, uses the brute to find directories, and then uses the spider to do a final sweep.
+
+Command: `tourmaline scan <URL>`
+
+Flags:
+- `-w|--wordlist <WORDLIST>`: The wordlist to use for brute forcing.
+
 ## Todos
-- Finish builder
-- Make sure docs are accurate
-- Installations
-    - Add package to `apt`
-- Add data and results views
+- Finish!
+- Add program to `apt` (`gold-team/tourmaline`)
+- ~~Add brute depth~~
+- ~~Update number of threads in the spider~~
+- ~~Finish CMS detection~~
+- ~~Web Scraping~~
+- Add some pictures to readme
+
+### Small Todos
+- Add a `--version` flag
+- Add squarespace and wix to CMS detection
+- Add `--no-`something flags to scan 
+- Add data scraper flags like get surounding characters/current tag
