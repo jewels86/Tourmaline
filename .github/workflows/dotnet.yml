@@ -62,13 +62,13 @@ jobs:
 
     steps:
     - name: Download Linux Artifacts
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: app-linux
         path: out
 
     - name: Download Windows Artifacts
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: app-windows
         path: out
