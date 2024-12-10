@@ -23,7 +23,7 @@ jobs:
 
     - name: Build self-contained executable for Linux
       run: |
-        dotnet publish -c Release -r linux-x64 --self-contained -o out/linux-x64/specific-directory
+        dotnet publish -c Release -r linux-x64 --self-contained -o out/linux-x64
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3
@@ -48,7 +48,7 @@ jobs:
 
     - name: Build self-contained executable for Windows
       run: |
-        dotnet publish -c Release -r win-x64 --self-contained -o out/win-x64/specific-directory
+        dotnet publish -c Release -r win-x64 --self-contained -o out/win-x64
 
     - name: Upload Build Artifacts
       uses: actions/upload-artifact@v3
