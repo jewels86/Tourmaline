@@ -52,6 +52,7 @@ Flags:
 - ~~Finish CMS detection~~
 - ~~Web Scraping~~
 - Add some pictures to readme
+- Fix automatic builds (publish not build)
 
 ### Small Todos
 - Add a `--version` flag
