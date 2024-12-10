@@ -50,7 +50,6 @@ Flags:
 - ~~Add brute depth~~
 - ~~Update number of threads in the spider~~
 - ~~Finish CMS detection~~
-- API Fuzzing
 - ~~Web Scraping~~
 - Add some pictures to readme
 
