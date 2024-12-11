@@ -7,3 +7,5 @@ Tourmaline/Tourmaline.csproj.user
 Testing
 .editorconfig
 /tourmaline-linux.zip
+/tourmaline-windows.zip
+build.sh
