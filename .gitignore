@@ -6,6 +6,8 @@ Tourmaline/Tourmaline.csproj.user
 .vscode
 Testing
 .editorconfig
+/tourmaline-linux.7z
+/tourmaline-windows.7z
+build.sh
 /tourmaline-linux.zip
 /tourmaline-windows.zip
-build.sh
