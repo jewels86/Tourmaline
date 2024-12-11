@@ -9,6 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="setup.ps1" />
+    <None Remove="setup.sh" />
     <None Remove="wordlists\cms-fuzzing\drupal.txt" />
     <None Remove="wordlists\html-analysis\drupal.txt" />
     <None Remove="wordlists\html-analysis\joomla.txt" />
@@ -23,6 +25,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="setup.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="setup.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="wordlists\cms-fuzzing\drupal.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
