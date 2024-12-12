@@ -1,5 +1,5 @@
 # Tourmaline
-A tunable, all-in-one directory enumeration toolkit.
+A comprehensive and effcient web enumeration toolkit.
 ## Overview
 **Tourmaline** is a command line tool for web penetration testing. 
 Tourmaline can be used to find directories, identify a site's CMS, and scrape websites for both files and data.
