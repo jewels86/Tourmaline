@@ -2,7 +2,7 @@
 A tunable, all-in-one directory enumeration toolkit.
 ## Overview
 **Tourmaline** is a command line tool for web penetration testing. 
-Tourmaline can be used to both find directories and identify a site's CMS.
+Tourmaline can be used to find directories, identify a site's CMS, and scrape websites for both files and data.
 ## Commands
 ### Global Flags
 - `-t|--threads <THREADS>`: The number of threads to use (defaults to `12`)
@@ -44,15 +44,28 @@ Command: `tourmaline scan <URL>`
 Flags:
 - `-w|--wordlist <WORDLIST>`: The wordlist to use for brute forcing.
 
+### File Scraper
+Scrapes files from a list of paths (which can be obtained through the spider or brute).
+
+Command: `tourmaline fscrape <url> <paths-file>`
+
+No flags so far.
+
+### Data Scraper
+Scrapes data from a list of pages.
+
+Command: `tourmaline dscrape <url> <paths-file>`
+
+No flags so far.
+
 ## Todos
-- Finish!
-- Add program to `apt` (`gold-team/tourmaline`)
+- ~~Finish!~~
+- Add program to `apt` and `winget`
 - ~~Add brute depth~~
 - ~~Update number of threads in the spider~~
 - ~~Finish CMS detection~~
 - ~~Web Scraping~~
 - Add some pictures to readme
-- Fix automatic builds (publish not build)
 
 ### Small Todos
 - Add a `--version` flag
