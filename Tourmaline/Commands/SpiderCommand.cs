@@ -96,7 +96,7 @@ namespace Tourmaline.Commands
 			table.AddEmptyRow();
 
 			table.AddRow("License", "GPL-3.0");
-			table.AddRow("Author", "Gold Team");
+			table.AddRow("Author", "Jewels");
 
 			AnsiConsole.Write(table);
 
