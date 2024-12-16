@@ -54,7 +54,7 @@ No flags so far.
 ### Data Scraper
 Scrapes data from a list of pages.
 
-Command: `tourmaline dscrape <url> <paths-file>`
+Command: `tourmaline dscrape <url> <paths-file> <regex>`
 
 No flags so far.
 
@@ -66,6 +66,7 @@ No flags so far.
 - ~~Finish CMS detection~~
 - ~~Web Scraping~~
 - Add some pictures to readme
+- Update the dscraper to take regex as a required arg
 
 ### Small Todos
 - Add a `--version` flag
