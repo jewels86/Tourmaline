@@ -28,8 +28,8 @@ namespace Tourmaline.Commands
 			[CommandArgument(1, "<PATHS-FILE>")]
 			public required string Paths { get; set; }
 
-			[CommandOption("-r|--regex <REGEX>")]
-			public string Regex { get; set; } = @".*";
+			[CommandArgument(1, "<REGEX>")]
+			public required string Regex { get; set; }
 		}
 
 		public async override Task<int> ExecuteAsync(CommandContext context, Settings settings)

@@ -66,7 +66,7 @@ No flags so far.
 - ~~Finish CMS detection~~
 - ~~Web Scraping~~
 - Add some pictures to readme
-- Update the dscraper to take regex as a required arg
+- ~~Update the dscraper to take regex as a required arg~~
 
 ### Small Todos
 - Add a `--version` flag
