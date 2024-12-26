@@ -107,7 +107,7 @@ namespace Tourmaline.Commands
 			if (settings.Debug) Console.WriteLine("Preparation complete.");
 
 			Brute brute = new(settings, paths);
-			Action<string, HttpStatusCode, int> action = (a, b, c) => AnsiConsole.WriteLine($"[bold green]{a}[/] - {(int)b} {b.ToString()} ([bold]{c}[/] left)");
+			Action<string, HttpStatusCode, int> action = (a, b, c) => AnsiConsole.MarkupLine($"[bold green]{a}[/] - {(int)b} {b.ToString()} ([bold]{c}[/] left)");
 			await brute.Enumerate(action);
 
 			return 0;
