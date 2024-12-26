@@ -100,7 +100,8 @@ namespace Tourmaline
 
 		internal async static Task<float> ScorePaths(string url, string name, HttpClient client)
 		{
-			string[] file = await File.ReadAllLinesAsync(Path.Combine(AppContext.BaseDirectory, "wordlists", "cms-fuzzing", $"{name}.txt"));
+			string basePath = OperatingSystem.IsLinux() ? "/usr/local/share/tourmaline" : AppContext.BaseDirectory;
+			string[] file = await File.ReadAllLinesAsync(Path.Combine(basePath, "wordlists", "cms-fuzzing", $"{name}.txt"));
 			Dictionary<string, int> files = ParseCMSFile(file);
 
 			int pathsScore = 0;
@@ -121,7 +122,8 @@ namespace Tourmaline
 		}
 		internal async static Task<float> AnalyzeHTML(string name, HttpResponseMessage res)
 		{
-			string[] tags = ReadFileAsLines(Path.Combine(AppContext.BaseDirectory, "wordlists", "html-analysis", $"{name}.txt"));
+			string basePath = OperatingSystem.IsLinux() ? "/usr/local/share/tourmaline" : AppContext.BaseDirectory;
+			string[] tags = ReadFileAsLines(Path.Combine(basePath, "wordlists", "html-analysis", $"{name}.txt"));
 			string html = await res.Content.ReadAsStringAsync();
 			int htmlScore = 0;
 

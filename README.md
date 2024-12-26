@@ -59,17 +59,10 @@ Command: `tourmaline dscrape <url> <paths-file> <regex>`
 No flags so far.
 
 ## Todos
-- ~~Finish!~~
 - Add program to `apt` and `winget`
-- ~~Add brute depth~~
-- ~~Update number of threads in the spider~~
-- ~~Finish CMS detection~~
-- ~~Web Scraping~~
 - Add some pictures to readme
-- ~~Update the dscraper to take regex as a required arg~~
-
-### Small Todos
 - Add a `--version` flag
 - Add squarespace and wix to CMS detection
 - Add `--no-`something flags to scan 
 - Add data scraper flags like get surounding characters/current tag
+- Fix CMS detection command to not use a preparation spinner
