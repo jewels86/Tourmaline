@@ -64,7 +64,7 @@ namespace Tourmaline.Commands
 			}
 
 			Table table = new();
-			table.AddColumns("[green]Tourmaline[/]", "v2.0");
+			table.AddColumns("[green]Tourmaline[/]", Functions.VERSION);
 			table.Width = 200;
 
 			table.AddRow("URL", settings.URL);

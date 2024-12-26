@@ -9,6 +9,8 @@ namespace Tourmaline
 {
 	internal static class Functions
 	{
+		internal const string VERSION = "v2.1.2";
+
 		internal static string ResolveURL(string baseUrl, params string[] parts)
 		{
 			StringBuilder sb;
