@@ -79,4 +79,3 @@ No flags so far.
 - Add squarespace and wix to CMS detection
 - Add `--no-`something flags to scan 
 - Add data scraper flags like get surounding characters/current tag
-- Fix commands to not use a preparation spinner

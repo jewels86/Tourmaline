@@ -104,16 +104,12 @@ namespace Tourmaline.Commands
 			status.Spinner = Spinner.Known.Dots;
 			try
 			{
-				await status.Start("Setting up...", async action =>
+				if (settings.Debug) Console.WriteLine("Preparing...");
+				if (!await Prepare(settings))
 				{
-					if (settings.Debug) Console.WriteLine("Preparing...");
-					await Task.Delay(5000);
-					if (!await Prepare(settings, action))
-					{
-						AnsiConsole.MarkupLine("[green]Tourmaline[/] is exiting (Error in preparation).");
-						return;
-					}
-				});
+					AnsiConsole.MarkupLine("[green]Tourmaline[/] is exiting (Error in preparation).");
+					return -1;
+				}
 			}
 			catch 
 			{
@@ -130,9 +126,8 @@ namespace Tourmaline.Commands
 			return 0;
 		}
 
-		public async Task<bool> Prepare(Settings s, StatusContext ctx)
+		public async Task<bool> Prepare(Settings s)
 		{
-			ctx.Status("Checking site accessiblity...");
 			HttpClient client = new();
 
 			try

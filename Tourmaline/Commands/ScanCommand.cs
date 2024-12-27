@@ -56,7 +56,6 @@ namespace Tourmaline.Commands
 			try
 			{
 				if (settings.Debug) Console.WriteLine("Preparing...");
-				await Task.Delay(5000);
 				if (!await Prepare(settings))
 				{
 					AnsiConsole.MarkupLine("[green]Tourmaline[/] is exiting (Error in preparation).");
