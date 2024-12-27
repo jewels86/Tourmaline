@@ -75,11 +75,9 @@ No flags so far.
 
 ## Todos
 - Add program to `apt` and `winget`
-- Add some pictures to readme
 - Add a `--version` flag
 - Add squarespace and wix to CMS detection
 - Add `--no-`something flags to scan 
 - Add data scraper flags like get surounding characters/current tag
-- Fix CMS detection command to not use a preparation spinner
-- Switch license to MIT
+- Fix commands to not use a preparation spinner
 - Fix weird duplicates in spider
