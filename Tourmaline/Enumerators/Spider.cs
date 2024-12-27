@@ -105,7 +105,7 @@ namespace Tourmaline.Enumerators
 							}
 						}
 
-						if (Regex.IsMatch(url) && !IgnoreRegex.IsMatch(url) && !found.Contains(url)) // !! not all urls are being processed everywhere
+						if (Regex.IsMatch(url) && !IgnoreRegex.IsMatch(url) && !found.Contains(url))
 						{
 							action(url, res.StatusCode, queue.Count);
 							found.Add(url);
@@ -146,6 +146,7 @@ namespace Tourmaline.Enumerators
 			int index = url.IndexOfAny(['#', '?']);
 			if (index != -1)
 				url = url.Substring(0, index);
+			url = Functions.RemoveTrailingSlash(url);
 
 			return url;
 		}

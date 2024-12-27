@@ -80,4 +80,3 @@ No flags so far.
 - Add `--no-`something flags to scan 
 - Add data scraper flags like get surounding characters/current tag
 - Fix commands to not use a preparation spinner
-- Fix weird duplicates in spider
