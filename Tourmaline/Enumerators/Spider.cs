@@ -105,7 +105,7 @@ namespace Tourmaline.Enumerators
 							}
 						}
 
-						if (Regex.IsMatch(url) && !IgnoreRegex.IsMatch(url))
+						if (Regex.IsMatch(url) && !IgnoreRegex.IsMatch(url) && !found.Contains(url)) // !! not all urls are being processed everywhere
 						{
 							action(url, res.StatusCode, queue.Count);
 							found.Add(url);
