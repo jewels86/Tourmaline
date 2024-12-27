@@ -6,6 +6,14 @@ A comprehensive and effcient web enumeration toolkit.
 ## Overview
 **Tourmaline** is a command line tool for web penetration testing. 
 Tourmaline can be used to find directories, identify a site's CMS, and scrape websites for both files and data.
+
+## Installation
+**Tourmaline** is currently only available for systems supporting debian packages. Download the latest Tourmaline `.deb` file and install it with:
+```
+sudo dpkg -i [FILE_NAME]
+```
+Where `[FILE_NAME]` is the name of the downloaded file.
+
 ## Commands
 ### Global Flags
 - `-t|--threads <THREADS>`: The number of threads to use (defaults to `12`)
@@ -63,6 +71,7 @@ No flags so far.
 
 ## Gallery
 ![tourmaline-1](https://github.com/user-attachments/assets/ad1d5082-c603-451a-bb92-d924b87ebc17)
+![tourmaline-3](https://github.com/user-attachments/assets/b6c5fcd7-9bc0-40d6-853c-da50e45059ee)
 
 ## Todos
 - Add program to `apt` and `winget`
@@ -72,3 +81,5 @@ No flags so far.
 - Add `--no-`something flags to scan 
 - Add data scraper flags like get surounding characters/current tag
 - Fix CMS detection command to not use a preparation spinner
+- Switch license to MIT
+- Fix weird duplicates in spider
