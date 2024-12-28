@@ -78,3 +78,4 @@ No flags so far.
 - Add squarespace and wix to CMS detection
 - Add `--no-[method]` flags to scan 
 - Add data scraper flags like get surounding characters/current tag
+- Write docs
