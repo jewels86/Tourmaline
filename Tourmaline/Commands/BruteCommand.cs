@@ -23,7 +23,7 @@ namespace Tourmaline.Commands
 			[CommandOption("-t|--threads <THREADS>")]
 			public int Threads { get; set; } = 12;
 
-			[CommandOption("-o|--outfiles <OUTFILE>")]
+			[CommandOption("-o|--outfile <OUTFILE>")]
 			public string OutFile { get; set; } = string.Empty;
 
 			[CommandOption("-d|--depth <DEPTH>")]
