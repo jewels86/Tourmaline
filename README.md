@@ -1,8 +1,6 @@
 # Tourmaline
 A comprehensive and effcient web enumeration toolkit.
 
-![tourmaline-2](https://github.com/user-attachments/assets/3be40f92-b47f-4828-aa77-8b82398a044b)
-
 ## Overview
 **Tourmaline** is a command line tool for web penetration testing. 
 Tourmaline can be used to find directories, identify a site's CMS, and scrape websites for both files and data.
@@ -70,8 +68,6 @@ Command: `tourmaline dscrape <url> <paths-file> <regex>`
 No flags so far.
 
 ## Gallery
-![tourmaline-1](https://github.com/user-attachments/assets/ad1d5082-c603-451a-bb92-d924b87ebc17)
-![tourmaline-3](https://github.com/user-attachments/assets/b6c5fcd7-9bc0-40d6-853c-da50e45059ee)
 
 ## Todos
 - Add program to `apt` and `winget`
