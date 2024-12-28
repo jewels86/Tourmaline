@@ -33,10 +33,10 @@ namespace Tourmaline.Commands
 			[CommandOption("-d|--depth <DEPTH>")]
 			public int Depth { get; set; } = -1;
 
-			[CommandOption("-r| --regex <REGEX>")]
+			[CommandOption("-r|--regex <REGEX>")]
 			public string Regex { get; set; } = @".*";
 
-			[CommandOption("-i| --ignore-regex <IGNORE-REGEX>")]
+			[CommandOption("-i|--ignore-regex <IGNORE_REGEX>")]
 			public string IgnoreRegex { get; set; } = "(?!)";
 
 			[CommandOption("--forceregex")]
@@ -45,7 +45,7 @@ namespace Tourmaline.Commands
 			[CommandOption("--forceignore")]
 			public bool ForceIgnore { get; set; } = false;
 
-			[CommandOption("-k| --known <KNOWN>")]
+			[CommandOption("-k|--known <KNOWN>")]
 			public string _Known { get; set; } = string.Empty;
 
 			[CommandOption("--known-file <KNOWN-FILE>")]
