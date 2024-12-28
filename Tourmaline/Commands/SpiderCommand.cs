@@ -39,16 +39,16 @@ namespace Tourmaline.Commands
 			[CommandOption("-i|--ignore-regex <IGNORE_REGEX>")]
 			public string IgnoreRegex { get; set; } = "(?!)";
 
-			[CommandOption("--forceregex")]
+			[CommandOption("--force-regex")]
 			public bool ForceRegex { get; set; } = false;
 
-			[CommandOption("--forceignore")]
+			[CommandOption("--force-ignore")]
 			public bool ForceIgnore { get; set; } = false;
 
 			[CommandOption("-k|--known <KNOWN>")]
 			public string _Known { get; set; } = string.Empty;
 
-			[CommandOption("--known-file <KNOWN-FILE>")]
+			[CommandOption("--known-file <KNOWN_FILE>")]
 			public string KnownFile { get; set; } = string.Empty;
 
 			[CommandOption("-l|--limit <LIMIT>")]
