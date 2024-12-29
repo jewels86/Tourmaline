@@ -16,7 +16,7 @@ namespace Tourmaline.Commands
 			[CommandArgument(0, "<URL>")]
 			public required string URL { get; set; }
 
-			[CommandOption("-o|--outfiles <OUTFILE>")]
+			[CommandOption("-o|--outfile <OUTFILE>")]
 			public string OutFile { get; set; } = string.Empty;
 
 			[CommandOption("--outfile-bare")]
