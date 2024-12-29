@@ -30,6 +30,7 @@ I will probably get back to you within 2-3 days!
 ## Todos
 - Add program to `apt` and `winget`
 - Add squarespace and wix to CMS detection
-- Add `--no-[method]` flags to scan 
+- Add `--no-[method]` flags to scan
+- Add `--no-[cms]` flags to cms
 - Add data scraper flags like get surounding characters/current tag
 - Remove Force flag
