@@ -29,9 +29,6 @@ namespace Tourmaline.Commands
 			[CommandOption("-d|--depth <DEPTH>")]
 			public int Depth { get; set; } = 1;
 
-			[CommandOption("--outfile-bare")]
-			public bool OutFileBare { get; set; } = false;
-
 			[CommandOption("--debug")]
 			public bool Debug { get; set; } = false;
 		}

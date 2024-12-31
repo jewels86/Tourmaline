@@ -17,14 +17,11 @@ namespace Tourmaline.Commands
 			[CommandArgument(0, "<URL>")]
 			public required string URL { get; set; }
 
-			[CommandOption("-o|--outfiles <OUTFILE>")]
+			[CommandOption("-o|--outfile <OUTFILE>")]
 			public string OutFile { get; set; } = string.Empty;
 
 			[CommandOption("-t|--threads <THREADS>")]
 			public int Threads { get; set; } = 12;
-
-			[CommandOption("--outfile-bare")]
-			public bool OutFileBare { get; set; } = false;
 
 			[CommandOption("--debug")]
 			public bool Debug { get; set; } = false;
