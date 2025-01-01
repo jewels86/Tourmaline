@@ -27,9 +27,6 @@ namespace Tourmaline.Commands
 			[CommandOption("--debug")]
 			public bool Debug { get; set; } = false;
 
-			[CommandOption("-f|--force")]
-			public bool Force { get; set; } = false;
-
 			[CommandOption("-d|--depth <DEPTH>")]
 			public int Depth { get; set; } = -1;
 

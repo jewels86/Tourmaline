@@ -33,4 +33,3 @@ I will probably get back to you within 2-3 days!
 - Add `--no-[method]` flags to scan
 - Add `--no-[cms]` flags to cms
 - Add data scraper flags like get surounding characters/current tag
-- Remove Force flag
