@@ -33,3 +33,4 @@ I will probably get back to you within 2-3 days!
 - Add `--no-[method]` flags to scan
 - Add data scraper flags like get surounding characters/current tag
 - Finish docs
+- Add outfile support to all commands
