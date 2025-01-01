@@ -83,7 +83,6 @@ namespace Tourmaline.Commands
 			table.AddRow("Threads", settings.Threads.ToString());
 			table.AddRow("Outfile", settings.OutFile == string.Empty ? "No outfile specified." : settings.OutFile);
 			table.AddRow("Debug Mode", settings.Debug.ToString());
-			table.AddRow("Force", settings.Force.ToString());
 			table.AddEmptyRow();
 
 			table.AddRow("Depth", settings.Depth != -1 ? settings.Depth.ToString() : "No depth specified.");
