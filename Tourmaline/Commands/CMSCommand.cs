@@ -19,6 +19,15 @@ namespace Tourmaline.Commands
 			[CommandOption("-o|--outfile <OUTFILE>")]
 			public string OutFile { get; set; } = string.Empty;
 
+			[CommandOption("--no-wordpress")]
+			public bool NoWordPress { get; set; } = false;
+
+			[CommandOption("--no-joomla")]
+			public bool NoJoomla { get; set; } = false;
+
+			[CommandOption("--no-drupal")]
+			public bool NoDrupal { get; set; } = false;
+
 			[CommandOption("--debug")]
 			public bool Debug { get; set; } = false;
 		}
@@ -42,8 +51,6 @@ namespace Tourmaline.Commands
 
 			AnsiConsole.Write(table);
 
-			Status status = AnsiConsole.Status();
-			status.Spinner = Spinner.Known.Dots;
 			try
 			{
 				if (settings.Debug) Console.WriteLine("Preparing...");
