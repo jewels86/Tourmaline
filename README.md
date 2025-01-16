@@ -31,6 +31,6 @@ I will probably get back to you within 2-3 days!
 - Add program to `apt` and `winget`
 - Add squarespace and wix to CMS detection
 - Add `--no-[method]` flags to scan
-- Add data scraper flags like get surounding characters/current tag
+- Add data scraper flags like get surrounding characters/current tag
 - Finish docs
 - Add outfile support to all commands

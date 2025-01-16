@@ -28,6 +28,15 @@ namespace Tourmaline.Commands
 
 			[CommandOption("-w|--wordlist <WORDLIST>")]
 			public string Wordlist { get; set; } = string.Empty;
+
+			[CommandOption("--no-spider")]
+			public bool NoSpider { get; set; } = false;
+
+			[CommandOption("--no-cms")]
+			public bool NoCMS { get; set; } = false;
+
+			[CommandOption("--no-brute")]
+			public bool NoBrute { get; set; } = false;
 		}
 
 		public async override Task<int> ExecuteAsync(CommandContext context, Settings settings)
@@ -62,7 +71,7 @@ namespace Tourmaline.Commands
 			catch (Exception e)
 			{
 				AnsiConsole.MarkupLine($"[red]Error:[/] {e.Message}");
-				return 1;
+				return -1;
 			}
 
 			Status scanStatus = AnsiConsole.Status();
@@ -73,45 +82,53 @@ namespace Tourmaline.Commands
 				List<(float score, string cmsName)> cmsResults = new();
 
 				List<Task> tasks = new List<Task>();
-				CMS cms = new(new CMSCommand.Settings
+				if (!settings.NoCMS)
 				{
-					URL = settings.URL,
-					OutFile = settings.OutFile,
-					Debug = settings.Debug
-				});
-				tasks.Add(Task.Run(async () => cmsResults = await cms.Enumerate()));
-				action.Status("CMS detection started...");
-
-				settings.Wordlist = settings.Wordlist == string.Empty ? "https://raw.githubusercontent.com/3ndG4me/KaliLists/refs/heads/master/dirb/common.txt" : settings.Wordlist;
-				string[] paths;
-
-				if (settings.Wordlist.StartsWith("http://") || settings.Wordlist.StartsWith("https://"))
-				{
-					HttpClient client = new();
-					HttpResponseMessage res = await client.GetAsync(settings.Wordlist);
-
-					string content = await res.Content.ReadAsStringAsync();
-					paths = content.Split("\n");
-					client.Dispose();
-				}
-				else
-				{
-					paths = Functions.ReadFileAsLines(settings.Wordlist);
+					CMS cms = new(new CMSCommand.Settings
+					{
+						URL = settings.URL,
+						OutFile = settings.OutFile,
+						Debug = settings.Debug
+					});
+				
+					tasks.Add(Task.Run(async () => cmsResults = await cms.Enumerate()));
+					action.Status("CMS detection started...");
 				}
 
-				action.Status("Brute forcing starting...");
-
-				Brute brute = new(new BruteCommand.Settings
+				if (!settings.NoBrute)
 				{
-					URL = settings.URL,
-					OutFile = settings.OutFile,
-					Threads = settings.Threads,
-					Debug = settings.Debug,
-					Wordlist = settings.Wordlist
-				}, paths);
-				tasks.Add(Task.Run(async () => found.AddRange(await brute.Enumerate((a, b, c) => { }))));
 
-				action.Status("Waiting for tasks (CMS)...");
+					settings.Wordlist = settings.Wordlist == string.Empty ? "https://raw.githubusercontent.com/3ndG4me/KaliLists/refs/heads/master/dirb/common.txt" : settings.Wordlist;
+					string[] paths;
+
+					if (settings.Wordlist.StartsWith("http://") || settings.Wordlist.StartsWith("https://"))
+					{
+						HttpClient client = new();
+						HttpResponseMessage res = await client.GetAsync(settings.Wordlist);
+
+						string content = await res.Content.ReadAsStringAsync();
+						paths = content.Split("\n");
+						client.Dispose();
+					}
+					else
+					{
+						paths = Functions.ReadFileAsLines(settings.Wordlist);
+					}
+
+					action.Status("Brute forcing starting...");
+
+					Brute brute = new(new BruteCommand.Settings
+					{
+						URL = settings.URL,
+						OutFile = settings.OutFile,
+						Threads = settings.Threads,
+						Debug = settings.Debug,
+						Wordlist = settings.Wordlist
+					}, paths);
+					tasks.Add(Task.Run(async () => found.AddRange(await brute.Enumerate((a, b, c) => { }))));
+				}
+
+				action.Status("Waiting for tasks (1)...");
 
 				await tasks[0];
 				string cmsResult = cmsResults[0].cmsName.Split(":")[0].ToLower();
@@ -125,7 +142,7 @@ namespace Tourmaline.Commands
 					HttpClient client = new();
 					HttpResponseMessage res = await client.GetAsync(cmsToWordlist[cmsResult]);
 					string content = await res.Content.ReadAsStringAsync();
-					paths = content.Split("\n");
+					string[] paths2 = content.Split("\n");
 
 					Brute brute2 = new(new BruteCommand.Settings
 					{
@@ -134,25 +151,27 @@ namespace Tourmaline.Commands
 						Threads = settings.Threads,
 						Debug = settings.Debug,
 						Wordlist = cmsToWordlist[cmsResult]
-					}, paths);	
+					}, paths2);	
 					tasks.Add(Task.Run(async () => found.AddRange(await brute2.Enumerate((a, b, c) => { }))));
 				}
 
-				action.Status("Waiting for tasks (Brute)...");
+				action.Status("Waiting for tasks (2)...");
 
 				Task.WaitAll(tasks.ToArray());
-
-				Spider spider = new(new SpiderCommand.Settings
+				if (!settings.NoSpider)
 				{
-					URL = settings.URL,
-					OutFile = settings.OutFile,
-					Threads = settings.Threads,
-					Debug = settings.Debug,
-					Known = found.ToArray()
-				});
+					Spider spider = new(new SpiderCommand.Settings
+					{
+						URL = settings.URL,
+						OutFile = settings.OutFile,
+						Threads = settings.Threads,
+						Debug = settings.Debug,
+						Known = found.ToArray()
+					});
 
-				action.Status("Spider started...");
-				await spider.Enumerate((a, b, c) => { });
+					action.Status("Spider started...");
+					await spider.Enumerate((a, b, c) => { });
+				}
 			});
 
 			AnsiConsole.MarkupLine("[green]Scan complete![/]");
