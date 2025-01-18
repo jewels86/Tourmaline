@@ -77,6 +77,11 @@ namespace Tourmaline.Commands
 				AnsiConsole.MarkupLine(val);
 			}
 
+			List<string> output = [];
+			foreach (var (score, val) in scores) output.Add(val);
+
+			if (settings.OutFile != string.Empty) File.WriteAllLines(settings.OutFile, output);
+
 			return 0;
 		}
 

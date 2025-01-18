@@ -76,10 +76,12 @@ namespace Tourmaline.Commands
 
 			await AnsiConsole.Status().StartAsync("Scraping data...", async (ctx) =>
 			{
-				await ds.Enumerate((url, status, count) =>
+				var output = await ds.Enumerate((url, status, count) =>
 				{
 					ctx.Status($"Scraping {url} ({status}) - {count} URLs left.");
 				});
+
+				if (settings.OutFile != string.Empty) File.WriteAllLines(settings.OutFile, output);
 			});
 
 			AnsiConsole.MarkupLine("[green]Data scraping complete![/]");

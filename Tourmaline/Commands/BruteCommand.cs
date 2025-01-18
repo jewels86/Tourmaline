@@ -101,7 +101,9 @@ namespace Tourmaline.Commands
 
 			Brute brute = new(settings, paths);
 			Action<string, HttpStatusCode, int> action = (a, b, c) => AnsiConsole.MarkupLine($"[bold green]{a}[/] - {(int)b} {b.ToString()} ([bold]{c}[/] left)");
-			await brute.Enumerate(action);
+			var output = await brute.Enumerate(action);
+
+			if (settings.OutFile != string.Empty) File.WriteAllLines(settings.OutFile, output);
 
 			return 0;
 		}

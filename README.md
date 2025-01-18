@@ -31,4 +31,3 @@ I will probably get back to you within 2-3 days!
 - Add squarespace and wix to CMS detection
 - Add data scraper flags like get surrounding characters/current tag
 - Finish docs
-- Add outfile support to all commands
