@@ -28,9 +28,7 @@ I will probably get back to you within 2-3 days!
 ![tourmaline-2](https://github.com/user-attachments/assets/9f4fbc5c-2173-48cb-b1e5-af2aedb3683f)
 
 ## Todos
-- Add program to `apt` and `winget`
 - Add squarespace and wix to CMS detection
-- Add `--no-[method]` flags to scan
 - Add data scraper flags like get surrounding characters/current tag
 - Finish docs
 - Add outfile support to all commands
