@@ -7,17 +7,17 @@ namespace Tourmaline;
 
 internal static partial class CMSFuncs
 {
-	internal static async Task<(float, string)> Joomla(string url, HttpClient client, bool debug)
+	internal static async Task<(float, string)> Joomla(string url, HttpClient client, bool verbose)
 	{
 		float score = 0;
 		HttpResponseMessage res = await client.GetAsync(url);
 
-		float pathScore = await Functions.ScorePaths(url, "joomla", client);
-		if (debug) Console.WriteLine($"Path Score: {pathScore}");
+		float pathScore = await Functions.ScorePaths(url, "joomla", client, verbose);
+		if (verbose) Console.WriteLine($"Path Score: {pathScore}");
 		score += pathScore;
 
-		float htmlScore = await Functions.AnalyzeHTML("joomla", res);
-		if (debug) Console.WriteLine($"HTML Score: {htmlScore}");
+		float htmlScore = await Functions.AnalyzeHTML("joomla", res, verbose);
+		if (verbose) Console.WriteLine($"HTML Score: {htmlScore}");
 		score += htmlScore;
 
 		// header analysis 
@@ -32,17 +32,17 @@ internal static partial class CMSFuncs
 			}
 		}
 		float headerScoreNormalized = (float)headerScore / headers.Length;
-		if (debug) Console.WriteLine($"Header Score: {headerScoreNormalized}");
+		if (verbose) Console.WriteLine($"Header Score: {headerScoreNormalized}");
 		score += headerScoreNormalized;
 
 		score = score / 3;
 
-		if (debug) Console.WriteLine($"Final Score: {score}");
+		if (verbose) Console.WriteLine($"Final Score: {score}");
 
 		string version = "No version found";
 
 		Regex regex = new Regex(@"\?version=(\d+\.\d+(\.\d+)?)", RegexOptions.IgnoreCase);
-		Match match = regex.Match(url);
+		Match match = regex.Match(""); // FIXME
 
 		if (match.Success)
 		{
@@ -53,6 +53,6 @@ internal static partial class CMSFuncs
 
 		}
 
-		return (score, $"[green]Joomla[/]: {score}% accuracy ({version})");
+		return (score, $"[green]Joomla[/]: {score}% certainty ({version})");
 	}
 }

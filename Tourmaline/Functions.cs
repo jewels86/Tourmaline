@@ -9,7 +9,7 @@ namespace Tourmaline
 {
 	internal static class Functions
 	{
-		internal const string VERSION = "v2.2.0";
+		internal const string VERSION = "v2.3.0";
 		
 		internal static string ResolveURL(string baseUrl, params string[] parts)
 		{
@@ -100,7 +100,7 @@ namespace Tourmaline
 			return output;
 		}
 
-		internal async static Task<float> ScorePaths(string url, string name, HttpClient client)
+		internal async static Task<float> ScorePaths(string url, string name, HttpClient client, bool verbose = false)
 		{
 			string basePath = OperatingSystem.IsLinux() ? "/usr/local/share/tourmaline" : AppContext.BaseDirectory;
 			string[] file = await File.ReadAllLinesAsync(Path.Combine(basePath, "wordlists", "cms-fuzzing", $"{name}.txt"));
@@ -116,13 +116,14 @@ namespace Tourmaline
 				HttpResponseMessage res = await client.GetAsync(ResolveURL(url, p));
 				if (res.IsSuccessStatusCode)
 				{
+					if (verbose) Console.WriteLine($"[{name}] Found {p} with score {s}/10");
 					pathsScore += s;
 				}
 			}
 
 			return 100 * (pathsScore / files.Count);
 		}
-		internal async static Task<float> AnalyzeHTML(string name, HttpResponseMessage res)
+		internal async static Task<float> AnalyzeHTML(string name, HttpResponseMessage res, bool verbose = false)
 		{
 			string basePath = OperatingSystem.IsLinux() ? "/usr/local/share/tourmaline" : AppContext.BaseDirectory;
 			string[] tags = ReadFileAsLines(Path.Combine(basePath, "wordlists", "html-analysis", $"{name}.txt"));
@@ -134,6 +135,7 @@ namespace Tourmaline
 				if (html.Contains(tag))
 				{
 					htmlScore += 1;
+					if (verbose) Console.WriteLine($"[{name}] Found HTML tag: '{tag}' for a total score of {htmlScore}");
 				}
 			}
 

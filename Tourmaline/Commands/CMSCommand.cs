@@ -19,6 +19,9 @@ namespace Tourmaline.Commands
 			[CommandOption("-o|--outfile <OUTFILE>")]
 			public string OutFile { get; set; } = string.Empty;
 
+			[CommandOption("-v|--verbose")]
+			public bool Verbose { get; set; } = false;
+
 			[CommandOption("--no-wordpress")]
 			public bool NoWordPress { get; set; } = false;
 
@@ -27,9 +30,6 @@ namespace Tourmaline.Commands
 
 			[CommandOption("--no-drupal")]
 			public bool NoDrupal { get; set; } = false;
-
-			[CommandOption("--debug")]
-			public bool Debug { get; set; } = false;
 		}
 
 		public async override Task<int> ExecuteAsync(CommandContext context, Settings settings)
@@ -43,7 +43,7 @@ namespace Tourmaline.Commands
 			table.AddRow("URL", settings.URL);
 			table.AddRow("Mode", "CMS Detection");
 			table.AddRow("Outfile", settings.OutFile == string.Empty ? "No outfile specified." : settings.OutFile);
-			table.AddRow("Debug Mode", settings.Debug.ToString());
+			table.AddRow("Verbose", settings.Verbose.ToString());
 			table.AddEmptyRow();
 
 			table.AddRow("License", "GPL-3.0");
@@ -53,7 +53,7 @@ namespace Tourmaline.Commands
 
 			try
 			{
-				if (settings.Debug) Console.WriteLine("Preparing...");
+				if (settings.Verbose) Console.WriteLine("Preparing...");
 				if (!await Prepare(settings))
 				{
 					AnsiConsole.MarkupLine("[green]Tourmaline[/] is exiting (Error in preparation).");
@@ -66,7 +66,7 @@ namespace Tourmaline.Commands
 				return -1;
 			}
 
-			if (settings.Debug) Console.WriteLine("Preparation complete.");
+			if (settings.Verbose) Console.WriteLine("Preparation complete.");
 
 			CMS cms = new(settings);
 			var scores = await cms.Enumerate();

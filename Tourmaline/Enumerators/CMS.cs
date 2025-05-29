@@ -11,7 +11,7 @@ namespace Tourmaline.Enumerators
 	{
 		public string URL { get; set; }
 		public string OutFile { get; set; }
-		public bool Debug { get; set; }
+		public bool Verbose { get; set; }
 		public bool NoWordPress { get; set; }
 		public bool NoJoomla { get; set; }
 		public bool NoDrupal { get; set; }
@@ -20,7 +20,7 @@ namespace Tourmaline.Enumerators
 		{
 			URL = Functions.RemoveTrailingSlash(settings.URL);
 			OutFile = settings.OutFile;
-			Debug = settings.Debug;
+			Verbose = settings.Verbose;
 			NoWordPress = settings.NoWordPress;
 			NoJoomla = settings.NoJoomla;
 			NoDrupal = settings.NoDrupal;
@@ -32,23 +32,23 @@ namespace Tourmaline.Enumerators
 			HttpClient client = new();
 			var scores = new List<(float score, string val)>();
 
-			if (Debug) Console.WriteLine("Starting CMS detection...");
+			if (Verbose) Console.WriteLine("Starting CMS detection...");
 
 			if (!NoWordPress)
 			{
-				(float wordpressScore, string wordpress) = await CMSFuncs.Wordpress(URL, client, Debug);
+				(float wordpressScore, string wordpress) = await CMSFuncs.Wordpress(URL, client, Verbose);
 				scores.Add((wordpressScore, wordpress));
 			}
 
 			if (!NoJoomla)
 			{
-				(float joomlaScore, string joomla) = await CMSFuncs.Joomla(URL, client, Debug);
+				(float joomlaScore, string joomla) = await CMSFuncs.Joomla(URL, client, Verbose);
 				scores.Add((joomlaScore, joomla));
 			}
 
 			if (!NoDrupal)
 			{
-				(float drupalScore, string drupal) = await CMSFuncs.Drupal(URL, client, Debug);
+				(float drupalScore, string drupal) = await CMSFuncs.Drupal(URL, client, Verbose);
 				scores.Add((drupalScore, drupal));
 			}
 

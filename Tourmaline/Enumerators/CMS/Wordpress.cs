@@ -7,16 +7,16 @@ namespace Tourmaline;
 
 internal static partial class CMSFuncs
 {
-    internal static async Task<(float, string)> Wordpress(string url, HttpClient client, bool debug) 
-    {
-        float score = 0;
+	internal static async Task<(float, string)> Wordpress(string url, HttpClient client, bool verbose)
+	{
+		float score = 0;
 		HttpResponseMessage res = await client.GetAsync(url);
 	
-		score += await Functions.ScorePaths(url, "wordpress", client);
-		score += await Functions.AnalyzeHTML("wordpress", res);
+		score += await Functions.ScorePaths(url, "wordpress", client, verbose);
+		score += await Functions.AnalyzeHTML("wordpress", res, verbose);
 	
 		// header analysis
-		if (debug) Console.WriteLine("Analyzing headers...");
+		if (verbose) Console.WriteLine("[wordpress] Analyzing headers...");
 	
 		int headerScore = 0;
 		List<string> headers = ["X-Powered-By: WordPress"];
@@ -32,11 +32,11 @@ internal static partial class CMSFuncs
 		score += headerScore / headers.Count;
 	
 		// pattern analysis
-		if (debug) Console.WriteLine("Analyzing patterns...");
+		if (verbose) Console.WriteLine("[wordpress] Analyzing patterns...");
 	
 		int patternScore = 0;
 	
-		HttpResponseMessage notfound = await client.GetAsync(Functions.ResolveURL(url, "probablynotfound"));
+		HttpResponseMessage notfound = await client.GetAsync(Functions.ResolveURL(url, "probablynotfound_"));
 		string notfoundpage = await notfound.Content.ReadAsStringAsync();
 		if (notfoundpage.Contains("<title>Page not found - WordPress</title>"))
 		{
@@ -73,6 +73,6 @@ internal static partial class CMSFuncs
 			}
 		}
 	
-		return (score, $"[green]Wordpress[/]: {score}% accuracy ({version})");
+		return (score, $"[green]Wordpress[/]: {score}% certaincy ({version})");
 	}
 }
