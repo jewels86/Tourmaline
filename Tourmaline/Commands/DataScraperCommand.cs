@@ -28,7 +28,7 @@ namespace Tourmaline.Commands
 			[CommandArgument(1, "<PATHS-FILE>")]
 			public required string Paths { get; set; }
 
-			[CommandArgument(1, "<REGEX>")]
+			[CommandArgument(2, "<REGEX>")]
 			public required string Regex { get; set; }
 		}
 
